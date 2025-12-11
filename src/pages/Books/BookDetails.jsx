@@ -1,60 +1,46 @@
-import React from 'react';
-import { useParams } from 'react-router-dom';
-import { getBook, placeOrder } from '../../services/api';
-import { useAuth } from '../../utils/AuthProvider';
+import React, { useEffect, useState } from 'react'
+import MainLayout from '../../layout/MainLayout'
+import { useParams } from 'react-router-dom'
+import axiosPublic from '../../api/axiosPublic'
+import { useAuth } from '../../hooks/useAuth'
 
 export default function BookDetails(){
-  const { id } = useParams();
-  const [book, setBook] = React.useState(null);
-  const [modalOpen, setModalOpen] = React.useState(false);
-  const [form, setForm] = React.useState({ phone: '', address: '' });
-  const { user } = useAuth();
+  const { id } = useParams()
+  const [book, setBook] = useState(null)
+  const { user } = useAuth()
 
-  React.useEffect(()=>{ getBook(id).then(r=> setBook(r)).catch(console.error); },[id]);
+  useEffect(() => {
+    const fetch = async () => {
+      const res = await axiosPublic.get(`/books/${id}`)
+      setBook(res.data)
+    }
+    fetch()
+  }, [id])
 
   const handleOrder = async () => {
-    try {
-      await placeOrder({ bookId: id, phone: form.phone, address: form.address });
-      setModalOpen(false);
-      alert('Order placed — pending and unpaid');
-    } catch (e) { console.error(e); alert('Order failed'); }
-  };
+    if (!user) return alert('Please login first')
+    const payload = { bookId: id, email: user.email, name: user.displayName, phone: '', address: '' }
+    await axiosPublic.post('/orders', payload)
+    alert('Order placed')
+  }
 
-  if (!book) return <div className="p-8">Loading...</div>;
+  if (!book) return <div className="p-8">Loading...</div>
 
   return (
-    <div className="p-8">
-      <div className="grid md:grid-cols-3 gap-6">
-        <img src={book.image || 'https://picsum.photos/400/500'} alt={book.title} className="w-full" />
-        <div className="md:col-span-2">
-          <h2 className="text-3xl font-bold">{book.title}</h2>
-          <p className="text-sm">by {book.author}</p>
-          <p className="mt-4">{book.description || 'No description provided.'}</p>
-          <div className="mt-6 flex gap-4">
-            <button onClick={()=> setModalOpen(true)} className="btn btn-primary">Order Now</button>
-          </div>
-
-          {modalOpen && (
-            <div className="modal modal-open">
-              <div className="modal-box">
-                <h3 className="font-bold text-lg">Order: {book.title}</h3>
-                <label className="block mt-3">Name</label>
-                <input className="input input-bordered w-full" value={user?.displayName || ''} readOnly />
-                <label className="block mt-3">Email</label>
-                <input className="input input-bordered w-full" value={user?.email || ''} readOnly />
-                <label className="block mt-3">Phone</label>
-                <input className="input input-bordered w-full" value={form.phone} onChange={e => setForm({...form, phone: e.target.value})} />
-                <label className="block mt-3">Address</label>
-                <textarea className="textarea textarea-bordered w-full" value={form.address} onChange={e => setForm({...form, address: e.target.value})}></textarea>
-                <div className="modal-action">
-                  <button className="btn" onClick={()=> setModalOpen(false)}>Cancel</button>
-                  <button className="btn btn-primary" onClick={handleOrder}>Place Order</button>
-                </div>
-              </div>
+    <MainLayout>
+      <div className="container mx-auto px-4 py-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <img src={book.image || '/assets/images/book-placeholder.png'} alt={book.bookName} className="w-full h-96 object-cover rounded" />
+          <div className="md:col-span-2">
+            <h2 className="text-3xl font-bold">{book.bookName}</h2>
+            <p className="text-muted">By {book.author}</p>
+            <p className="mt-4">{book.description || 'No description available'}</p>
+            <div className="mt-6 flex gap-4">
+              <button className="btn btn-primary" onClick={handleOrder}>Order Now</button>
             </div>
-          )}
+          </div>
         </div>
       </div>
-    </div>
-  );
+    </MainLayout>
+  )
 }

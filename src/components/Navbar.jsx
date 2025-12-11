@@ -1,47 +1,37 @@
-import React from 'react';
-import { Link, NavLink } from 'react-router-dom';
-import { useAuth } from '../utils/AuthProvider';
-import { FaMoon, FaSun, FaUserCircle, FaBars } from 'react-icons/fa';
+import React from 'react'
+import { Link, NavLink } from 'react-router-dom'
+import { useAuth } from '../hooks/useAuth'
+import { Menu } from 'lucide-react'
 
-export default function Navbar() {
-  const { user } = useAuth();
-  const [open, setOpen] = React.useState(false);
+export default function Navbar(){
+  const { user, logout } = useAuth()
 
   return (
-    <nav className="navbar bg-base-100 shadow-md px-4">
-      <div className="flex-1">
-        <Link to="/" className="btn btn-ghost normal-case text-xl">📚 BookCourier</Link>
+    <div className="navbar bg-base-100 shadow-md">
+      <div className="flex-1 px-4">
+        <Link to="/" className="flex items-center gap-2">
+          <div className="w-10 h-10 bg-primary text-base-100 rounded-full flex items-center justify-center font-bold">BC</div>
+          <span className="font-semibold text-lg">BookCourier</span>
+        </Link>
       </div>
-
-      <div className="hidden md:flex gap-2">
-        <NavLink to="/" className="btn btn-ghost">Home</NavLink>
-        <NavLink to="/books" className="btn btn-ghost">Books</NavLink>
-        <NavLink to="/dashboard" className="btn btn-ghost">Dashboard</NavLink>
+      <div className="flex-none hidden md:block">
+        <ul className="menu menu-horizontal p-0">
+          <li><NavLink to="/">Home</NavLink></li>
+          <li><NavLink to="/books">Books</NavLink></li>
+          <li><NavLink to="/dashboard">Dashboard</NavLink></li>
+          {!user && <li><NavLink to="/login">Login</NavLink></li>}
+          {user && (
+            <li className="flex items-center gap-2">
+              <img src={user.photoURL || '/favicon.ico'} alt="profile" className="w-8 h-8 rounded-full" />
+            </li>
+          )}
+        </ul>
       </div>
-
-      <div className="flex items-center gap-2">
-        <button className="btn btn-ghost" title="Toggle theme"><FaMoon/></button>
-        {user ? (
-          <Link to="/dashboard" className="avatar">
-            <div className="w-8 rounded-full">
-              <img src={user.photoURL || 'https://i.pravatar.cc/150?img=3'} alt="avatar" />
-            </div>
-          </Link>
-        ) : (
-          <Link to="/login" className="btn btn-primary">Login</Link>
-        )}
-
-        <button className="md:hidden btn btn-ghost" onClick={()=> setOpen(!open)}><FaBars/></button>
+      <div className="md:hidden">
+        <button className="btn btn-ghost btn-circle">
+          <Menu />
+        </button>
       </div>
-
-      {open && (
-        <div className="md:hidden absolute right-4 top-16 bg-base-200 rounded shadow p-3">
-          <NavLink to="/" className="block py-1">Home</NavLink>
-          <NavLink to="/books" className="block py-1">Books</NavLink>
-          <NavLink to="/dashboard" className="block py-1">Dashboard</NavLink>
-          <NavLink to="/login" className="block py-1">Login</NavLink>
-        </div>
-      )}
-    </nav>
-  );
+    </div>
+  )
 }

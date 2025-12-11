@@ -1,54 +1,57 @@
-import React, { useState } from 'react';
-import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
-import { auth } from '../../firebase/firebase.config';
-import { useNavigate } from 'react-router-dom';
-import api from '../../services/api';
+import React, { useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import { getAuth, createUserWithEmailAndPassword, updateProfile } from 'firebase/auth'
+import { firebaseApp } from '../../firebase/firebase.config'
 
 export default function Register(){
-  const [form, setForm] = useState({ name: '', email: '', password: '', avatar: null });
-  const [loading, setLoading] = useState(false);
-  const nav = useNavigate();
+  const auth = getAuth(firebaseApp)
+  const navigate = useNavigate()
+  const [name, setName] = useState('')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [image, setImage] = useState(null)
+  const [error, setError] = useState(null)
 
-  function readFileAsDataURL(file) {
-    return new Promise((res, rej) => {
-      const r = new FileReader();
-      r.onload = () => res(r.result);
-      r.onerror = rej;
-      r.readAsDataURL(file);
-    });
+  const validatePassword = (pwd) => {
+    // strong password: min 8, one uppercase, one number
+    return /(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,}/.test(pwd)
   }
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      setLoading(true);
-      const { user } = await createUserWithEmailAndPassword(auth, form.email, form.password);
-      let photoURL = null;
-      if (form.avatar) photoURL = await readFileAsDataURL(form.avatar);
-      await updateProfile(user, { displayName: form.name, photoURL });
-      await api.syncUser();
-      alert('Registered');
-      nav('/');
-    } catch (e) {
-      alert(e.message);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const handleRegister = async (e) => {
+    e.preventDefault()
+    if (!validatePassword(password)) return setError('Password must be at least 8 characters, contain an uppercase letter and a number')
+
+    try{
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password)
+      await updateProfile(userCredential.user, { displayName: name, photoURL: image || null })
+      navigate('/')
+    }catch(err){ setError(err.message) }
+  }
 
   return (
-    <div className="min-h-[70vh] flex items-center justify-center p-4">
-      <form className="card w-full max-w-md p-6 shadow" onSubmit={handleSubmit}>
-        <h2 className="text-2xl font-bold mb-4">Register</h2>
-        <input className="input input-bordered w-full mb-2" placeholder="Name" value={form.name} onChange={e => setForm({...form, name: e.target.value})} required />
-        <input className="input input-bordered w-full mb-2" placeholder="Email" value={form.email} onChange={e => setForm({...form, email: e.target.value})} required type="email" />
-        <input className="input input-bordered w-full mb-2" placeholder="Password" value={form.password} onChange={e => setForm({...form, password: e.target.value})} required type="password" />
-        <label className="block mb-2">Avatar</label>
-        <input type="file" accept="image/*" onChange={e => setForm({...form, avatar: e.target.files[0]})} />
-        <div className="mt-4">
-          <button className="btn btn-primary w-full" disabled={loading}>{loading ? 'Registering...' : 'Register'}</button>
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="card w-full max-w-md shadow">
+        <div className="card-body">
+          <h2 className="card-title">Register</h2>
+          <form onSubmit={handleRegister} className="space-y-4">
+            <input type="text" placeholder="Name" value={name} onChange={e=>setName(e.target.value)} className="input input-bordered w-full" required />
+            <input type="email" placeholder="Email" value={email} onChange={e=>setEmail(e.target.value)} className="input input-bordered w-full" required />
+            <input type="password" placeholder="Password" value={password} onChange={e=>setPassword(e.target.value)} className="input input-bordered w-full" required />
+
+            <div>
+              <label className="block text-sm">Profile Image (optional)</label>
+              <input type="file" accept="image/*" onChange={e=>setImage(URL.createObjectURL(e.target.files[0]))} className="mt-2" />
+            </div>
+
+            {error && <p className="text-error">{error}</p>}
+
+            <div className="flex justify-between items-center">
+              <button className="btn btn-primary">Register</button>
+              <Link to="/login" className="link">Already have an account?</Link>
+            </div>
+          </form>
         </div>
-      </form>
+      </div>
     </div>
-  );
+  )
 }

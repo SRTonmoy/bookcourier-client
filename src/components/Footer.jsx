@@ -1,25 +1,76 @@
-import React from 'react'
+import React from "react";
+import { FaGithub, FaLinkedin, FaXTwitter, FaEnvelope, FaPhone } from "react-icons/fa6";
 
-export default function Footer(){
+export default function Footer() {
   return (
-    <footer className="footer p-10 bg-base-200 text-base-content">
-      <div>
-        <span className="footer-title">BookCourier</span>
-        <a className="link link-hover">About us</a>
-        <a className="link link-hover">Contact</a>
-        <a className="link link-hover">Terms</a>
+    <footer className="bg-base-200 text-base-content">
+      {/* Top Section */}
+      <div className="footer p-10 max-w-7xl mx-auto grid gap-8 md:grid-cols-4">
+        
+        {/* Brand */}
+        <aside>
+          <h2 className="text-2xl font-bold text-primary">📚 BookCourier</h2>
+          <p className="mt-3 text-sm opacity-80">
+            Delivering books safely and quickly to your doorstep.  
+            A trusted platform for readers, sellers, and libraries.
+          </p>
+        </aside>
+
+        {/* Services */}
+        <nav>
+          <h6 className="footer-title">Services</h6>
+          <a className="link link-hover">Book Delivery</a>
+          <a className="link link-hover">Cash on Delivery</a>
+          <a className="link link-hover">Bulk Orders</a>
+          <a className="link link-hover">Order Tracking</a>
+        </nav>
+
+        {/* Company */}
+        <nav>
+          <h6 className="footer-title">Company</h6>
+          <a className="link link-hover">About Us</a>
+          <a className="link link-hover">Careers</a>
+          <a className="link link-hover">Privacy Policy</a>
+          <a className="link link-hover">Terms & Conditions</a>
+        </nav>
+
+        {/* Contact */}
+        <nav>
+          <h6 className="footer-title">Contact</h6>
+          <p className="flex items-center gap-2 text-sm">
+            <FaEnvelope /> support@bookcourier.com
+          </p>
+          <p className="flex items-center gap-2 text-sm">
+            <FaPhone /> +880 1XXX-XXXXXX
+          </p>
+
+          {/* Social Icons */}
+          <div className="mt-4 flex gap-4 text-xl">
+            <a aria-label="X (Twitter)" className="hover:text-primary transition">
+              <FaXTwitter />
+            </a>
+            <a aria-label="LinkedIn" className="hover:text-primary transition">
+              <FaLinkedin />
+            </a>
+            <a aria-label="GitHub" className="hover:text-primary transition">
+              <FaGithub />
+            </a>
+          </div>
+        </nav>
       </div>
-      <div>
-        <span className="footer-title">Social</span>
-        <div className="grid grid-flow-col gap-4">
-          <a aria-label="X (Twitter)" className="link link-hover">X</a>
-          <a aria-label="LinkedIn" className="link link-hover">LinkedIn</a>
-          <a aria-label="GitHub" className="link link-hover">GitHub</a>
+
+      {/* Bottom Bar */}
+      <div className="border-t border-base-300">
+        <div className="max-w-7xl mx-auto px-6 py-4 flex flex-col md:flex-row items-center justify-between gap-2 text-sm">
+          <p>
+            © {new Date().getFullYear()} <span className="font-semibold">BookCourier</span>.  
+            All rights reserved.
+          </p>
+          <p className="opacity-70">
+            Built with ❤️ using React, Tailwind & daisyUI
+          </p>
         </div>
       </div>
-      <div className="items-center">
-        <p>© {new Date().getFullYear()} BookCourier. All rights reserved.</p>
-      </div>
     </footer>
-  )
+  );
 }

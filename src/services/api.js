@@ -4,21 +4,18 @@ import { getAuth } from "firebase/auth";
 import app from "../firebase/firebase.config";
 
 // Base URL from .env
-const BASE_URL = import.meta.env.VITE_API_URL;
+const BASE_URL = import.meta.env.VITE_SERVER_URL || "http://localhost:5000";
+
 
 // Firebase Auth instance
 const auth = getAuth(app);
 
-// ------------------------------------------------------
-// PUBLIC axios instance
-// ------------------------------------------------------
+
 const axiosPublic = axios.create({
   baseURL: BASE_URL,
 });
 
-// ------------------------------------------------------
-// SECURE axios instance (JWT attached automatically)
-// ------------------------------------------------------
+
 const axiosSecure = axios.create({
   baseURL: BASE_URL,
 });
@@ -40,7 +37,7 @@ axiosSecure.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Optional: error handler
+
 axiosSecure.interceptors.response.use(
   (res) => res,
   (err) => {

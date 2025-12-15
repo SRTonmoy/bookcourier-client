@@ -6,9 +6,14 @@ import { Link } from 'react-router-dom';
 export default function Home(){
   const [books, setBooks] = React.useState([]);
 
-  React.useEffect(()=>{
-    getBooks({ limit: 6 }).then(r => setBooks(r.data)).catch(console.error);
-  },[]);
+  React.useEffect(() => {
+  getBooks()
+    .then(data => {
+      console.log("BOOKS FROM API:", data);
+      setBooks(data.slice(0, 6));
+    })
+    .catch(console.error);
+}, []);
 
   return (
     <div>

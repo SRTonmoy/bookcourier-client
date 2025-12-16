@@ -1,6 +1,6 @@
 import React from 'react';
 import BookCard from '../../components/BookCard';
-import { getBooks } from '../../services/api';
+import axiosPublic from '../../api/axiosPublic';
 import { Link } from 'react-router-dom';
 
 export default function Home(){

@@ -18,7 +18,10 @@ export default function Navbar(){
         <ul className="menu menu-horizontal p-0">
           <li><NavLink to="/">Home</NavLink></li>
           <li><NavLink to="/books">Books</NavLink></li>
-          <li><NavLink to="/dashboard">Dashboard</NavLink></li>
+          <li><NavLink to="/dashboard" className="btn btn-sm">
+  Dashboard
+</NavLink>
+</li>
           {!user && <li><NavLink to="/login">Login</NavLink></li>}
           {user && (
             <li className="flex items-center gap-2">

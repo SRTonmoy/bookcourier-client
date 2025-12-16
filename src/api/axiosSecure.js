@@ -1,14 +1,20 @@
 import axios from "axios";
+import { getAuth } from "firebase/auth";
+import firebaseApp from "../firebase/firebase.config";
 
 const axiosSecure = axios.create({
-  baseURL: import.meta.env.VITE_SERVER_URL || "http://localhost:5000",
+  baseURL: import.meta.env.VITE_SERVER_URL,
 });
 
-axiosSecure.interceptors.request.use((config) => {
-  const token = localStorage.getItem("access-token");
-  if (token) {
+axiosSecure.interceptors.request.use(async (config) => {
+  const auth = getAuth(firebaseApp);
+  const user = auth.currentUser;
+
+  if (user) {
+    const token = await user.getIdToken();
     config.headers.Authorization = `Bearer ${token}`;
   }
+
   return config;
 });
 

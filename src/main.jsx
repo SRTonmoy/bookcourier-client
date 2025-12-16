@@ -6,6 +6,7 @@ import App from './App'
 import './styles/index.css'
 import { AuthProvider } from './context/AuthProvider'
 
+
 const queryClient = new QueryClient()
 
 createRoot(document.getElementById('root')).render(

@@ -6,6 +6,7 @@ import MyBooks from "../pages/Dashboard/librarian/MyBooks";
 import AllUsers from "../pages/Dashboard/admin/AllUsers";
 import ManageBooks from "../pages/Dashboard/admin/ManageBooks";
 
+// Always include paths relative to /dashboard
 export const userRoutes = [
   { path: "", element: <MyOrders /> },
   { path: "profile", element: <MyProfile /> },

@@ -10,7 +10,6 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [role, setRole] = useState("user");
   const [loading, setLoading] = useState(true);
-  const [jwtToken, setJwtToken] = useState(null);
 
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (currentUser) => {
@@ -20,22 +19,15 @@ export const AuthProvider = ({ children }) => {
         setUser(currentUser);
 
         try {
-          // 1️⃣ Create user in backend if not exists
-          await axiosPublic.post("/users", {
+          // Create user in DB (if not exists)
+          await axiosPublic.post("/api/users", {
             email: currentUser.email,
             name: currentUser.displayName,
           });
 
-          // 2️⃣ Get backend JWT
-          const jwtRes = await axiosPublic.post("/jwt", {
-            email: currentUser.email,
-          });
-
-          const token = jwtRes.data.token;
-          setJwtToken(token);
-
-          // 3️⃣ Get role using backend JWT
-          const res = await axiosPublic.get("/users/role", {
+          // Get role from backend
+          const token = await currentUser.getIdToken();
+          const res = await axiosPublic.get("/api/users/role", {
             headers: {
               Authorization: `Bearer ${token}`,
             },
@@ -48,7 +40,6 @@ export const AuthProvider = ({ children }) => {
       } else {
         setUser(null);
         setRole("user");
-        setJwtToken(null);
       }
 
       setLoading(false);
@@ -61,11 +52,10 @@ export const AuthProvider = ({ children }) => {
     await signOut(auth);
     setUser(null);
     setRole("user");
-    setJwtToken(null);
   };
 
   return (
-    <AuthContext.Provider value={{ user, role, loading, logout, jwtToken }}>
+    <AuthContext.Provider value={{ user, role, loading, logout }}>
       {children}
     </AuthContext.Provider>
   );

@@ -1,0 +1,58 @@
+/* Tailwind core */
+@import "tailwindcss";
+
+/* DaisyUI plugin */
+@plugin "daisyui";
+
+/* Global variables */
+:root {
+  --brand: #0ea5a4;  /* teal */
+  --accent: #6366f1; /* indigo */
+
+  /* Optional improvements */
+  --radius: 0.75rem;
+  --shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+/* Reset + full height layout */
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+
+  /* improves text rendering */
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Smooth scroll for better UX */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Utility class for card images */
+.card-img {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+  border-radius: var(--radius);
+}
+
+/* Optional: Custom scrollbar (nice for dashboards) */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--brand) #e5e7eb;
+}
+
+*::-webkit-scrollbar {
+  width: 8px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: var(--brand);
+  border-radius: 8px;
+}
+
+*::-webkit-scrollbar-track {
+  background: #e5e7eb;
+}

@@ -27,29 +27,33 @@ export default function DashboardLayout() {
       >
         <h2 className="text-xl font-bold mb-4">Dashboard</h2>
         <ul className="menu">
-          {role === "user" && (
-            <>
-              <li>
-                <NavLink to="/dashboard/MyOrders" onClick={() => setSidebarOpen(false)}>
-                  My Orders
-                </NavLink>
-              </li>
-              <li>
-                <NavLink
-                  to="/dashboard/MyProfile"
-                  onClick={() => setSidebarOpen(false)}
-                >
-                  My Profile
-                </NavLink>
-              </li>
-            </>
-          )}
+          {/* In DashboardLayout.jsx */}
+{role === "user" && (
+  <>
+    <li>
+      <NavLink to="/dashboard/orders" onClick={() => setSidebarOpen(false)}>
+        My Orders
+      </NavLink>
+    </li>
+    <li>
+      <NavLink to="/dashboard/profile" onClick={() => setSidebarOpen(false)}>
+        My Profile
+      </NavLink>
+    </li>
+    <li>
+      <NavLink to="/dashboard/wishlist" onClick={() => setSidebarOpen(false)}>
+        My Wishlist
+      </NavLink>
+    </li>
+  </>
+)}
+
 
           {role === "librarian" && (
             <>
               <li>
                 <NavLink
-                  to="/dashboard/AddBook"
+                  to="/dashboard/add-book"
                   onClick={() => setSidebarOpen(false)}
                 >
                   Add Book
@@ -57,7 +61,7 @@ export default function DashboardLayout() {
               </li>
               <li>
                 <NavLink
-                  to="/dashboard/MyBooks"
+                  to="/dashboard/my-books"
                   onClick={() => setSidebarOpen(false)}
                 >
                   My Books
@@ -70,7 +74,7 @@ export default function DashboardLayout() {
             <>
               <li>
                 <NavLink
-                  to="/dashboard/AllUsers"
+                  to="/dashboard/users"
                   onClick={() => setSidebarOpen(false)}
                 >
                   All Users
@@ -78,7 +82,7 @@ export default function DashboardLayout() {
               </li>
               <li>
                 <NavLink
-                  to="/dashboard/ManageBooks"
+                  to="/dashboard/manage-books"
                   onClick={() => setSidebarOpen(false)}
                 >
                   Manage Books

@@ -44,7 +44,7 @@ export default function BookDetails(){
   if (!book) return <div className="p-8">Loading...</div>
 
   return (
-    <MainLayout>
+   
       <div className="container mx-auto px-4 py-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <img
@@ -68,6 +68,6 @@ export default function BookDetails(){
           </div>
         </div>
       </div>
-    </MainLayout>
+    
   )
 }

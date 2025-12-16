@@ -17,7 +17,7 @@ export default function AllBooks(){
   }, [search, sort])
 
   return (
-    <MainLayout>
+    
       <div className="container mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-2xl font-semibold">All Books</h2>
@@ -33,6 +33,6 @@ export default function AllBooks(){
           {books.map(b=> <BookCard key={b._id} book={b} />)}
         </div>
       </div>
-    </MainLayout>
+    
   )
 }

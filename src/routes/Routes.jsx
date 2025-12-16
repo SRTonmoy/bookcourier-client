@@ -7,6 +7,8 @@ import Register from "../pages/Auth/Register";
 import PrivateRoute from "./PrivateRoutes";
 import { userRoutes, librarianRoutes, adminRoutes } from "./dashboardRoutes.jsx";
 import { useAuth } from "../hooks/useAuth";
+import AllBooks from "../pages/Books/AllBooks";
+import BookDetails from "../pages/Books/BookDetails";
 
 export default function RoutesApp() {
   const { role } = useAuth();
@@ -18,6 +20,8 @@ export default function RoutesApp() {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/books" element={<AllBooks />} />
+        <Route path="/books/:id" element={<BookDetails />} />
       </Route>
 
       {/* Dashboard routes (protected) */}

@@ -30,13 +30,13 @@ export default function DashboardLayout() {
           {role === "user" && (
             <>
               <li>
-                <NavLink to="/dashboard" onClick={() => setSidebarOpen(false)}>
+                <NavLink to="/dashboard/MyOrders" onClick={() => setSidebarOpen(false)}>
                   My Orders
                 </NavLink>
               </li>
               <li>
                 <NavLink
-                  to="/dashboard/profile"
+                  to="/dashboard/MyProfile"
                   onClick={() => setSidebarOpen(false)}
                 >
                   My Profile
@@ -49,7 +49,7 @@ export default function DashboardLayout() {
             <>
               <li>
                 <NavLink
-                  to="/dashboard/add-book"
+                  to="/dashboard/AddBook"
                   onClick={() => setSidebarOpen(false)}
                 >
                   Add Book
@@ -57,7 +57,7 @@ export default function DashboardLayout() {
               </li>
               <li>
                 <NavLink
-                  to="/dashboard/my-books"
+                  to="/dashboard/MyBooks"
                   onClick={() => setSidebarOpen(false)}
                 >
                   My Books
@@ -70,7 +70,7 @@ export default function DashboardLayout() {
             <>
               <li>
                 <NavLink
-                  to="/dashboard/users"
+                  to="/dashboard/AllUsers"
                   onClick={() => setSidebarOpen(false)}
                 >
                   All Users
@@ -78,7 +78,7 @@ export default function DashboardLayout() {
               </li>
               <li>
                 <NavLink
-                  to="/dashboard/manage-books"
+                  to="/dashboard/ManageBooks"
                   onClick={() => setSidebarOpen(false)}
                 >
                   Manage Books

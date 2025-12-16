@@ -4,7 +4,7 @@ import DashboardLayout from "../layout/DashboardLayout";
 import Home from "../pages/Home/Home";
 import Login from "../pages/Auth/Login";
 import Register from "../pages/Auth/Register";
-import PrivateRoute from "./privateRoutes";
+import PrivateRoute from "./PrivateRoutes";
 import { userRoutes, librarianRoutes, adminRoutes } from "./dashboardRoutes.jsx";
 import { useAuth } from "../hooks/useAuth";
 
@@ -20,7 +20,7 @@ export default function RoutesApp() {
         <Route path="/register" element={<Register />} />
       </Route>
 
-      {/* Dashboard routes */}
+      {/* Dashboard routes (protected) */}
       <Route
         path="/dashboard/*"
         element={
@@ -30,16 +30,22 @@ export default function RoutesApp() {
         }
       >
         {role === "user" &&
-          userRoutes.map(r => <Route key={r.path} path={r.path} element={r.element} />)}
+          userRoutes.map(r => (
+            <Route key={r.path} path={r.path} element={r.element} />
+          ))}
 
         {role === "librarian" &&
-          librarianRoutes.map(r => <Route key={r.path} path={r.path} element={r.element} />)}
+          librarianRoutes.map(r => (
+            <Route key={r.path} path={r.path} element={r.element} />
+          ))}
 
         {role === "admin" &&
-          adminRoutes.map(r => <Route key={r.path} path={r.path} element={r.element} />)}
+          adminRoutes.map(r => (
+            <Route key={r.path} path={r.path} element={r.element} />
+          ))}
       </Route>
 
-      {/* Catch-all for 404 */}
+      {/* 404 fallback */}
       <Route path="*" element={<h2 className="p-8 text-center">Page Not Found</h2>} />
     </Routes>
   );

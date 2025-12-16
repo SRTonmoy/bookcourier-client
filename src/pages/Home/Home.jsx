@@ -4,6 +4,7 @@ import axiosPublic from '../../api/axiosPublic';
 import { Link } from 'react-router-dom';
 import { getBooks } from "../../services/bookService";
 
+import CoverageMap from "../../components/CoverageMap";
 
 export default function Home(){
   const [books, setBooks] = React.useState([]);
@@ -43,6 +44,12 @@ export default function Home(){
           <div className="card p-6 shadow">Wide Network — multiple libraries available.</div>
           <div className="card p-6 shadow">Easy Returns — schedule return pickups.</div>
         </div>
+      </section>
+      <section className="p-8 bg-base-100">
+        <div>
+      <h2 className="text-2xl font-bold my-6">Book Delivery Coverage</h2>
+      <CoverageMap />
+    </div>
       </section>
     </div>
   );

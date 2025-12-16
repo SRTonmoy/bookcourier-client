@@ -2,6 +2,8 @@ import React from 'react';
 import BookCard from '../../components/BookCard';
 import axiosPublic from '../../api/axiosPublic';
 import { Link } from 'react-router-dom';
+import { getBooks } from "../../services/bookService";
+
 
 export default function Home(){
   const [books, setBooks] = React.useState([]);

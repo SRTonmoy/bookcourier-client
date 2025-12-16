@@ -2,6 +2,8 @@ import React from 'react'
 import { Link, NavLink } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { Menu } from 'lucide-react'
+import login from '../pages/Auth/Login'
+
 
 export default function Navbar(){
   const { user, logout } = useAuth()

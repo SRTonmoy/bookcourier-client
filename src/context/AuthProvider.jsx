@@ -2,6 +2,7 @@ import { createContext, useEffect, useState } from "react";
 import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
 import firebaseApp from "../firebase/firebase.config";
 import axiosPublic from "../api/axiosPublic";
+import axiosSecure from "../api/axiosSecure";
 
 export const AuthContext = createContext(null);
 
@@ -19,25 +20,22 @@ export const AuthProvider = ({ children }) => {
         setUser(currentUser);
 
         try {
-          // Create user in DB (if not exists)
-          await axiosPublic.post("/api/users", {
+          // Create user in DB if not exists
+          await axiosPublic.post("/users", {
             email: currentUser.email,
             name: currentUser.displayName,
           });
 
-          // Get role from backend
-          const token = await currentUser.getIdToken();
-          const res = await axiosPublic.get("/api/users/role", {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          });
-
+          // Wait until currentUser exists in axiosSecure
+          // Fetch role from backend securely
+          const res = await axiosSecure.get("/users/role");
           setRole(res.data.role || "user");
         } catch (err) {
           console.error("AuthProvider error:", err);
+          setRole("user"); // fallback to user
         }
       } else {
+        // User logged out
         setUser(null);
         setRole("user");
       }
@@ -49,9 +47,14 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const logout = async () => {
-    await signOut(auth);
-    setUser(null);
-    setRole("user");
+    try {
+      await signOut(auth);
+    } catch (err) {
+      console.error("Logout failed:", err);
+    } finally {
+      setUser(null);
+      setRole("user");
+    }
   };
 
   return (

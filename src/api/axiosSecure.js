@@ -3,19 +3,31 @@ import { getAuth } from "firebase/auth";
 import firebaseApp from "../firebase/firebase.config";
 
 const axiosSecure = axios.create({
-  baseURL: import.meta.env.VITE_SERVER_URL,
+  baseURL: import.meta.env.VITE_SERVER_URL, // make sure this ends with /api
 });
 
-axiosSecure.interceptors.request.use(async (config) => {
-  const auth = getAuth(firebaseApp);
-  const user = auth.currentUser;
+// Interceptor to attach Firebase ID token
+axiosSecure.interceptors.request.use(
+  async (config) => {
+    try {
+      const auth = getAuth(firebaseApp);
+      const user = auth.currentUser;
 
-  if (user) {
-    const token = await user.getIdToken();
-    config.headers.Authorization = `Bearer ${token}`;
+      if (user) {
+        // Force refresh to ensure token is valid
+        const token = await user.getIdToken(true);
+        config.headers.Authorization = `Bearer ${token}`;
+      }
+
+      return config;
+    } catch (err) {
+      console.error("Axios Secure Interceptor error:", err);
+      return config; // fallback to request without Authorization
+    }
+  },
+  (error) => {
+    return Promise.reject(error);
   }
-
-  return config;
-});
+);
 
 export default axiosSecure;

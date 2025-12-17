@@ -47,11 +47,7 @@ export default function Home(){
       </section>
       <section className="p-8 bg-base-100">
   <div>
-    <h2 className="text-3xl font-bold mb-6 text-center">Book Delivery Coverage</h2>
-    <p className="text-center text-muted mb-8 max-w-2xl mx-auto">
-      We serve 8 major cities across Bangladesh with 45+ partner libraries. 
-      Click on the map to explore our service areas.
-    </p>
+    
     <CoverageMap />
   </div>
 </section>

@@ -1,10 +1,3 @@
-// layout/DashboardLayout.jsx
-// ENHANCED DESIGN VERSION
-// - Improved visual hierarchy
-// - Better spacing and alignment
-// - Enhanced sidebar aesthetics
-// - Cleaner header design
-// - Smooth transitions and polish
 
 import React, { useState, useEffect } from 'react';
 import { Link, Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom';
@@ -21,6 +14,7 @@ import {
 } from 'lucide-react';
 
 export default function DashboardLayout() {
+  
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);

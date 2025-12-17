@@ -6,6 +6,7 @@ import ThemePreview from './components/ThemePreview';
 export default function App() {
   return (
     <div className="min-h-screen bg-base-100 transition-colors duration-300">
+   
       <RoutesApp />
       
     

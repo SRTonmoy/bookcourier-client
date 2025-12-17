@@ -67,29 +67,29 @@ export default function BookDetails() {
 
   if (loading) {
     return (
-      
+      <MainLayout>
         <div className="container mx-auto px-4 py-12">
           <div className="flex justify-center">
             <span className="loading loading-spinner loading-lg"></span>
           </div>
         </div>
-      
+      </MainLayout>
     );
   }
 
   if (!book) {
     return (
-     
+      <MainLayout>
         <div className="container mx-auto px-4 py-12 text-center">
           <h2 className="text-2xl font-bold text-error">Book not found</h2>
           <p className="mt-2">The book you're looking for doesn't exist.</p>
         </div>
-      
+      </MainLayout>
     );
   }
 
   return (
-   
+    <MainLayout>
       <div className="container mx-auto px-4 py-8">
         {/* Breadcrumb */}
         <div className="text-sm breadcrumbs mb-6">
@@ -300,7 +300,7 @@ export default function BookDetails() {
           </div>
         </div>
       </div>
-  )
+
       {/* Order Modal (Placeholder - to be implemented) */}
       {showOrderModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
@@ -330,6 +330,6 @@ export default function BookDetails() {
     // You can redirect to orders page or show confirmation
   }}
 />
- 
-
+    </MainLayout>
+  );
 }

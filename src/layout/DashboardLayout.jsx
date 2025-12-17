@@ -1,7 +1,7 @@
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { Menu, X, Home } from "lucide-react";
-import useRole from "../hooks/useRole";
+import {useRole} from "../hooks/useRole";
 import { useAuth } from "../hooks/useAuth";
 
 export default function DashboardLayout() {

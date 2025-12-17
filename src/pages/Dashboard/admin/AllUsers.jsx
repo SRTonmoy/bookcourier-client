@@ -1,30 +1,17 @@
-import { useEffect, useState } from "react";
-import axiosSecure from "../../../api/axiosSecure";
+import DashboardStats from "../../../components/DashboardStats";
 
 export default function AllUsers() {
-  const [users, setUsers] = useState([]);
-
-  useEffect(() => {
-    axiosSecure.get("/users").then(res => setUsers(res.data));
-  }, []);
+  const stats = [
+    { label: "Total Users", value: 120 },
+    { label: "Admins", value: 2 },
+    { label: "Librarians", value: 5 },
+    { label: "Customers", value: 113 },
+  ];
 
   return (
-    <div>
-      <h2 className="text-xl font-semibold mb-4">All Users</h2>
-
-      <table className="table">
-        <thead>
-          <tr><th>Email</th><th>Role</th></tr>
-        </thead>
-        <tbody>
-          {users.map(u => (
-            <tr key={u._id}>
-              <td>{u.email}</td>
-              <td>{u.role}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+    <>
+      <DashboardStats stats={stats} />
+      <h2 className="text-xl font-bold">All Users</h2>
+    </>
   );
 }

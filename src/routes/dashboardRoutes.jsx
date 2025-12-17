@@ -8,7 +8,7 @@ import ManageBooks from "../pages/Dashboard/admin/ManageBooks";
 
 // Always include paths relative to /dashboard
 export const userRoutes = [
-  { path: "orders", element: <MyOrders /> },
+  { path: "", element: <MyOrders /> },
   { path: "profile", element: <MyProfile /> },
   { path: "wishlist", element: <MyWishlist /> },
 ];

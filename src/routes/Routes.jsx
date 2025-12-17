@@ -5,52 +5,68 @@ import Home from "../pages/Home/Home";
 import Login from "../pages/Auth/Login";
 import Register from "../pages/Auth/Register";
 import PrivateRoute from "./PrivateRoutes";
-import { userRoutes, librarianRoutes, adminRoutes } from "./dashboardRoutes.jsx";
+import { userRoutes, librarianRoutes, adminRoutes } from "./dashboardRoutes";
 import { useAuth } from "../hooks/useAuth";
-import AllBooks from "../pages/Books/AllBooks";
-import BookDetails from "../pages/Books/BookDetails";
 
 export default function RoutesApp() {
   const { role } = useAuth();
 
   return (
     <Routes>
-      {/* Public routes */}
+      {/* Public */}
       <Route element={<MainLayout />}>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/books" element={<AllBooks />} />
-        <Route path="/books/:id" element={<BookDetails />} />
       </Route>
 
-      {/* Dashboard routes (protected) */}
+      {/* Dashboard */}
       <Route
-        path="/dashboard/*"
+        path="/dashboard"
         element={
           <PrivateRoute>
             <DashboardLayout />
           </PrivateRoute>
         }
       >
+        {/* DEFAULT DASHBOARD PAGE */}
+        {role === "user" && (
+          <Route index element={userRoutes[0].element} />
+        )}
+
+        {role === "librarian" && (
+          <Route index element={librarianRoutes[0].element} />
+        )}
+
+        {role === "admin" && (
+          <Route index element={adminRoutes[0].element} />
+        )}
+
+        {/* ROLE ROUTES */}
         {role === "user" &&
-          userRoutes.map(r => (
-            <Route key={r.path} path={r.path} element={r.element} />
-          ))}
+          userRoutes.map(
+            r => r.path && (
+              <Route key={r.path} path={r.path} element={r.element} />
+            )
+          )}
 
         {role === "librarian" &&
-          librarianRoutes.map(r => (
-            <Route key={r.path} path={r.path} element={r.element} />
-          ))}
+          librarianRoutes.map(
+            r => r.path && (
+              <Route key={r.path} path={r.path} element={r.element} />
+            )
+          )}
 
         {role === "admin" &&
-          adminRoutes.map(r => (
-            <Route key={r.path} path={r.path} element={r.element} />
-          ))}
+          adminRoutes.map(
+            r => r.path && (
+              <Route key={r.path} path={r.path} element={r.element} />
+            )
+          )}
       </Route>
 
-      {/* 404 fallback */}
-      <Route path="*" element={<h2 className="p-8 text-center">Page Not Found</h2>} />
+      {/* 404 */}
+      <Route path="*" element={<h2 className="p-10 text-center">Not Found</h2>} />
     </Routes>
   );
 }

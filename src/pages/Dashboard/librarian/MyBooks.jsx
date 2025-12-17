@@ -1,24 +1,17 @@
-import { useEffect, useState } from "react";
-import axiosSecure from "../../../api/axiosSecure";
+import DashboardStats from "../../../components/DashboardStats";
 
 export default function MyBooks() {
-  const [books, setBooks] = useState([]);
-
-  useEffect(() => {
-    axiosSecure.get("/books/my").then(res => setBooks(res.data));
-  }, []);
+  const stats = [
+    { label: "Total Books", value: 24 },
+    { label: "Available", value: 18 },
+    { label: "Out of Stock", value: 6 },
+    { label: "Orders", value: 31 },
+  ];
 
   return (
-    <div>
-      <h2 className="text-xl font-semibold mb-4">My Books</h2>
-
-      <ul className="space-y-2">
-        {books.map(b => (
-          <li key={b._id} className="p-3 border rounded">
-            {b.bookName} — ${b.price}
-          </li>
-        ))}
-      </ul>
-    </div>
+    <>
+      <DashboardStats stats={stats} />
+      <h2 className="text-xl font-bold">My Books</h2>
+    </>
   );
 }

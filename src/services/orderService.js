@@ -1,7 +1,17 @@
-import api from "./api";
+import axiosSecure from "../api/axiosSecure";
 
-export const createOrder = (order) =>
-  api.post("/api/orders", order);
+export const createOrder = (order) => {
+  return axiosSecure.post("/orders", order);
+};
 
-export const getMyOrders = () =>
-  api.get("/api/orders/my");
+export const myOrders = () => {
+  return axiosSecure.get("/orders/my");
+};
+
+export const getAllOrders = () => {
+  return axiosSecure.get("/orders");
+};
+
+export const confirmPayment = (id) => {
+  return axiosSecure.patch(`/orders/pay/${id}`);
+};

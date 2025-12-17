@@ -1,13 +1,33 @@
-import React from 'react'
-import MainLayout from '../../layout/MainLayout'
+import { createOrder } from "../../services/orderService";
+import { useAuth } from "../../hooks/useAuth";
 
-export default function PaymentPage(){
+export default function PaymentPage({ books, total }) {
+  const { user } = useAuth();
+
+  const handlePayment = async () => {
+    const order = {
+      userEmail: user.email,
+      books,
+      totalPrice: total,
+      paymentMethod: "cash",
+    };
+
+    await createOrder(order);
+    alert("Order placed. Pay on delivery.");
+  };
+
   return (
-    <MainLayout>
-      <div className="container mx-auto px-4 py-8">
-        <h2 className="text-2xl font-semibold">Payment</h2>
-        <p>Payment flow placeholder (integrate Stripe/PayPal)</p>
-      </div>
-    </MainLayout>
-  )
+    <div className="max-w-xl mx-auto p-6">
+      <h2 className="text-xl font-bold mb-4">Cash on Delivery</h2>
+
+      <p>Total Amount: <b>${total}</b></p>
+
+      <button
+        onClick={handlePayment}
+        className="btn btn-primary mt-4 w-full"
+      >
+        Confirm Order
+      </button>
+    </div>
+  );
 }

@@ -1,4 +1,6 @@
-import api from "./api";
+import axiosSecure from "../api/axiosSecure";
 
-export const createPaymentIntent = (price) =>
-  api.post("/api/payments/create-intent", { price });
+export const createPayment = async (orderId) => {
+  const { data } = await axiosSecure.post("/payments/create", { orderId });
+  return data;
+};

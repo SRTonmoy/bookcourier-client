@@ -151,5 +151,3 @@ npm run dev
 
 **BookCourier**
 Built as a full-stack MERN project with role-based authentication.
-
----

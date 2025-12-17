@@ -89,7 +89,7 @@ export default function BookDetails() {
   }
 
   return (
-    <MainLayout>
+    <>
       <div className="container mx-auto px-4 py-8">
         {/* Breadcrumb */}
         <div className="text-sm breadcrumbs mb-6">
@@ -330,6 +330,6 @@ export default function BookDetails() {
     // You can redirect to orders page or show confirmation
   }}
 />
-    </MainLayout>
+    </>
   );
 }

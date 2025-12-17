@@ -1,13 +1,23 @@
-// pages/Books/BookDetails.jsx - UPDATED
+// pages/Books/BookDetails.jsx - FIXED VERSION
 import React, { useEffect, useState } from 'react';
 import MainLayout from '../../layout/MainLayout';
 import { useParams } from 'react-router-dom';
 import axiosPublic from '../../api/axiosPublic';
+import axiosSecure from '../../api/axiosSecure';
 import { useAuth } from '../../hooks/useAuth';
 import WishlistButton from '../../components/WishlistButton';
 import OrderModal from '../../components/OrderModal';
-import { ShoppingCart, Share2, BookOpen, Clock, Truck } from 'lucide-react';
-
+import ReviewForm from '../../components/ReviewForm';
+import ReviewsSection from '../../components/ReviewsSection';
+import { 
+  ShoppingCart, 
+  Share2, 
+  BookOpen, 
+  Clock, 
+  Truck,
+  MessageSquare,
+  Star
+} from 'lucide-react';
 
 export default function BookDetails() {
   const { id } = useParams();
@@ -15,6 +25,13 @@ export default function BookDetails() {
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
   const [showOrderModal, setShowOrderModal] = useState(false);
+  const [showReviewForm, setShowReviewForm] = useState(false);
+  const [userCanReview, setUserCanReview] = useState(false);
+  const [checkingReviewEligibility, setCheckingReviewEligibility] = useState(false);
+  const [bookStats, setBookStats] = useState({
+    averageRating: 0,
+    reviewCount: 0
+  });
 
   useEffect(() => {
     const fetchBook = async () => {
@@ -22,6 +39,14 @@ export default function BookDetails() {
         setLoading(true);
         const res = await axiosPublic.get(`/books/${id}`);
         setBook(res.data);
+        
+        // Extract review stats from book data
+        if (res.data) {
+          setBookStats({
+            averageRating: res.data.avgRating || 0,
+            reviewCount: res.data.reviewCount || 0
+          });
+        }
       } catch (err) {
         console.error("Failed to load book", err);
       } finally {
@@ -33,6 +58,31 @@ export default function BookDetails() {
       fetchBook();
     }
   }, [id]);
+
+  const checkReviewEligibility = async () => {
+    if (!user || !book?._id) {
+      setUserCanReview(false);
+      return;
+    }
+
+    setCheckingReviewEligibility(true);
+    try {
+      const response = await axiosSecure.get(`/reviews/can-review/${book._id}`);
+      setUserCanReview(response.data.canReview);
+    } catch (error) {
+      console.error('Check review eligibility error:', error);
+      setUserCanReview(false);
+    } finally {
+      setCheckingReviewEligibility(false);
+    }
+  };
+
+  // Call this when book loads
+  useEffect(() => {
+    if (book && user) {
+      checkReviewEligibility();
+    }
+  }, [book, user]);
 
   const handleOrder = () => {
     if (!user) {
@@ -62,6 +112,20 @@ export default function BookDetails() {
           message: 'Link copied to clipboard!' 
         }
       }));
+    }
+  };
+
+  const handleReviewSubmitted = () => {
+    setShowReviewForm(false);
+    // Refresh book data to get updated ratings
+    if (id) {
+      axiosPublic.get(`/books/${id}`).then(res => {
+        setBook(res.data);
+        setBookStats({
+          averageRating: res.data.avgRating || 0,
+          reviewCount: res.data.reviewCount || 0
+        });
+      });
     }
   };
 
@@ -125,17 +189,26 @@ export default function BookDetails() {
                     size="lg"
                   />
                 </div>
+
+                {/* Rating Badge */}
+                {bookStats.averageRating > 0 && (
+                  <div className="absolute bottom-4 left-4 bg-primary text-primary-content px-3 py-1 rounded-full flex items-center gap-1 shadow-lg">
+                    <Star size={16} className="fill-current" />
+                    <span className="font-bold">{bookStats.averageRating.toFixed(1)}</span>
+                    <span className="text-xs">({bookStats.reviewCount})</span>
+                  </div>
+                )}
               </div>
 
               {/* Quick Actions */}
               <div className="mt-6 grid grid-cols-2 gap-3">
-               <button
-  onClick={() => setShowOrderModal(true)}
-  className="btn btn-primary btn-lg flex items-center justify-center gap-2"
->
-  <ShoppingCart size={20} />
-  Order Now
-</button>
+                <button
+                  onClick={handleOrder}
+                  className="btn btn-primary btn-lg flex items-center justify-center gap-2"
+                >
+                  <ShoppingCart size={20} />
+                  Order Now
+                </button>
                 
                 <button
                   onClick={handleShare}
@@ -145,6 +218,17 @@ export default function BookDetails() {
                   Share
                 </button>
               </div>
+
+              {/* Write Review Button */}
+              {userCanReview && !showReviewForm && (
+                <button
+                  onClick={() => setShowReviewForm(true)}
+                  className="btn btn-secondary btn-lg w-full mt-3 gap-2"
+                >
+                  <MessageSquare size={20} />
+                  Write a Review
+                </button>
+              )}
 
               {/* Quick Info */}
               <div className="mt-6 card bg-base-200 p-4">
@@ -195,6 +279,31 @@ export default function BookDetails() {
                   <div className="text-sm text-muted">Free delivery</div>
                 </div>
               </div>
+
+              {/* Rating Display */}
+              {bookStats.averageRating > 0 && (
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="flex items-center gap-1">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <Star
+                        key={star}
+                        size={20}
+                        className={
+                          star <= Math.round(bookStats.averageRating)
+                            ? 'fill-yellow-400 text-yellow-400'
+                            : 'fill-gray-300 text-gray-300'
+                        }
+                      />
+                    ))}
+                  </div>
+                  <span className="font-bold text-lg">
+                    {bookStats.averageRating.toFixed(1)} out of 5
+                  </span>
+                  <span className="text-muted">
+                    ({bookStats.reviewCount} review{bookStats.reviewCount !== 1 ? 's' : ''})
+                  </span>
+                </div>
+              )}
 
               {/* Tags */}
               <div className="flex flex-wrap gap-2 mb-6">
@@ -271,21 +380,22 @@ export default function BookDetails() {
               </div>
             </div>
 
-            {/* Reviews Section (Placeholder) */}
-            <div className="mb-8">
-              <h2 className="text-xl font-bold mb-4">Reviews</h2>
-              <div className="alert alert-info">
-                <div>
-                  <span>⭐</span>
-                  <div>
-                    <h3 className="font-bold">Be the first to review!</h3>
-                    <div className="text-sm">
-                      Only users who have ordered this book can leave reviews.
-                    </div>
-                  </div>
-                </div>
+            {/* Review Form */}
+            {showReviewForm && userCanReview && (
+              <div className="mb-8">
+                <ReviewForm
+                  bookId={book._id}
+                  bookName={book.bookName}
+                  onReviewSubmitted={handleReviewSubmitted}
+                  onCancel={() => setShowReviewForm(false)}
+                />
               </div>
-            </div>
+            )}
+
+            {/* Reviews Section */}
+            <section className="mb-8">
+              <ReviewsSection bookId={book._id} />
+            </section>
           </div>
         </div>
 
@@ -301,35 +411,25 @@ export default function BookDetails() {
         </div>
       </div>
 
-      {/* Order Modal (Placeholder - to be implemented) */}
-      {showOrderModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-          <div className="modal-box max-w-2xl">
-            <h3 className="font-bold text-lg mb-4">Order "{book.bookName}"</h3>
-            <p>Order form will be implemented here with address and payment details.</p>
-            <div className="modal-action">
-              <button 
-                onClick={() => setShowOrderModal(false)}
-                className="btn"
-              >
-                Close
-              </button>
-              <button className="btn btn-primary">
-                Place Order
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Order Modal */}
       <OrderModal
-  isOpen={showOrderModal}
-  onClose={() => setShowOrderModal(false)}
-  book={book}
-  onOrderSuccess={(order) => {
-    console.log('Order successful:', order);
-    // You can redirect to orders page or show confirmation
-  }}
-/>
+        isOpen={showOrderModal}
+        onClose={() => setShowOrderModal(false)}
+        book={book}
+        onOrderSuccess={(order) => {
+          console.log('Order successful:', order);
+          window.dispatchEvent(new CustomEvent('show-toast', {
+            detail: { 
+              type: 'success', 
+              message: 'Order placed successfully! You can now review this book after delivery.' 
+            }
+          }));
+          // Refresh review eligibility after ordering
+          if (user) {
+            checkReviewEligibility();
+          }
+        }}
+      />
     </>
   );
 }

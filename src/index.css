@@ -60,3 +60,167 @@ html {
 *::-webkit-scrollbar-track {
   background: #e5e7eb;
 }
+/* styles/global.css - ADD THESE STYLES */
+
+/* Smooth theme transition */
+* {
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Custom theme variables */
+:root {
+  --color-primary: #0ea5a4;
+  --color-secondary: #6366f1;
+  --color-accent: #f59e0b;
+  
+  /* Light theme */
+  --bg-base: #ffffff;
+  --bg-base-100: #f9fafb;
+  --bg-base-200: #f3f4f6;
+  --bg-base-300: #e5e7eb;
+  --text-color: #1f2937;
+  --text-muted: #6b7280;
+}
+
+[data-theme="dark"] {
+  /* Dark theme */
+  --bg-base: #111827;
+  --bg-base-100: #1f2937;
+  --bg-base-200: #374151;
+  --bg-base-300: #4b5563;
+  --text-color: #f9fafb;
+  --text-muted: #9ca3af;
+}
+
+/* Apply custom colors */
+body {
+  background-color: var(--bg-base);
+  color: var(--text-color);
+}
+
+/* Custom button styles for theme */
+.btn-primary {
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.btn-primary:hover {
+  background-color: color-mix(in srgb, var(--color-primary) 80%, black);
+}
+
+.btn-secondary {
+  background-color: var(--color-secondary);
+  border-color: var(--color-secondary);
+}
+
+/* Card styling */
+.card {
+  background-color: var(--bg-base-100);
+  border: 1px solid var(--bg-base-300);
+}
+
+/* Form elements */
+.input, .textarea, .select {
+  background-color: var(--bg-base-100);
+  border-color: var(--bg-base-300);
+  color: var(--text-color);
+}
+
+.input:focus, .textarea:focus, .select:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-primary) 30%, transparent);
+}
+
+/* Table styling */
+.table :where(th, td) {
+  background-color: var(--bg-base-100);
+  border-color: var(--bg-base-300);
+}
+
+.table tr:hover :where(th, td) {
+  background-color: var(--bg-base-200);
+}
+
+/* Badge styling */
+.badge {
+  background-color: var(--bg-base-300);
+  color: var(--text-color);
+  border: 1px solid var(--bg-base-300);
+}
+
+.badge-primary {
+  background-color: var(--color-primary);
+  color: white;
+  border-color: var(--color-primary);
+}
+
+.badge-outline {
+  background-color: transparent;
+  color: var(--text-color);
+  border-color: var(--bg-base-300);
+}
+
+/* Alert styling */
+.alert {
+  background-color: var(--bg-base-200);
+  border-color: var(--bg-base-300);
+  color: var(--text-color);
+}
+
+/* Stats styling */
+.stats {
+  background-color: var(--bg-base-100);
+  border-color: var(--bg-base-300);
+}
+
+/* Hero banner */
+.hero {
+  background-color: var(--bg-base-200);
+}
+
+/* Gradient text */
+.text-gradient {
+  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Theme transition loader */
+.theme-transition {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--bg-base);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.theme-transition.active {
+  opacity: 1;
+}
+
+/* Custom scrollbar for theme */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-base-200);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-primary);
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in srgb, var(--color-primary) 80%, black);
+}

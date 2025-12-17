@@ -1,8 +1,16 @@
+// pages/Dashboard/user/MyWishlist.jsx
+import React from 'react';
+import DashboardLayout from '../../../layout/DashboardLayout';
+
 export default function MyWishlist() {
   return (
-    <div>
-      <h2 className="text-xl font-semibold mb-4">My Wishlist</h2>
-      <p className="opacity-70">Wishlist feature coming soon.</p>
-    </div>
+    <DashboardLayout>
+      <div className="p-6">
+        <h2 className="text-2xl font-bold mb-6">My Wishlist</h2>
+        <div className="alert alert-info">
+          <span>Wishlist feature coming soon!</span>
+        </div>
+      </div>
+    </DashboardLayout>
   );
 }

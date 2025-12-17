@@ -1,8 +1,16 @@
+// pages/Dashboard/user/MyInvoices.jsx
+import React from 'react';
+import DashboardLayout from '../../../layout/DashboardLayout';
+
 export default function MyInvoices() {
   return (
-    <div>
-      <h2 className="text-xl font-semibold mb-4">My Invoices</h2>
-      <p className="opacity-70">Invoices will appear here.</p>
-    </div>
+    <DashboardLayout>
+      <div className="p-6">
+        <h2 className="text-2xl font-bold mb-6">My Invoices</h2>
+        <div className="alert alert-info">
+          <span>Invoice feature coming soon!</span>
+        </div>
+      </div>
+    </DashboardLayout>
   );
 }

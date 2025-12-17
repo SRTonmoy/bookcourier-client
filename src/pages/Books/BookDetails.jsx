@@ -5,7 +5,9 @@ import { useParams } from 'react-router-dom';
 import axiosPublic from '../../api/axiosPublic';
 import { useAuth } from '../../hooks/useAuth';
 import WishlistButton from '../../components/WishlistButton';
+import OrderModal from '../../components/OrderModal';
 import { ShoppingCart, Share2, BookOpen, Clock, Truck } from 'lucide-react';
+
 
 export default function BookDetails() {
   const { id } = useParams();
@@ -127,13 +129,13 @@ export default function BookDetails() {
 
               {/* Quick Actions */}
               <div className="mt-6 grid grid-cols-2 gap-3">
-                <button
-                  onClick={handleOrder}
-                  className="btn btn-primary btn-lg flex items-center justify-center gap-2"
-                >
-                  <ShoppingCart size={20} />
-                  Order Now
-                </button>
+               <button
+  onClick={() => setShowOrderModal(true)}
+  className="btn btn-primary btn-lg flex items-center justify-center gap-2"
+>
+  <ShoppingCart size={20} />
+  Order Now
+</button>
                 
                 <button
                   onClick={handleShare}
@@ -319,6 +321,15 @@ export default function BookDetails() {
           </div>
         </div>
       )}
+      <OrderModal
+  isOpen={showOrderModal}
+  onClose={() => setShowOrderModal(false)}
+  book={book}
+  onOrderSuccess={(order) => {
+    console.log('Order successful:', order);
+    // You can redirect to orders page or show confirmation
+  }}
+/>
     </MainLayout>
   );
 }

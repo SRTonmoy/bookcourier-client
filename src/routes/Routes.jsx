@@ -70,10 +70,10 @@ export default function RoutesApp() {
 
         {/* Dashboard Routes */}
         <Route path="/dashboard" element={
-          <ProtectedRoute>
-            <DashboardLayout />
-          </ProtectedRoute>
-        }>
+  <ProtectedRoute>
+    <DashboardLayout /> {/* NO MainLayout wrapper! */}
+  </ProtectedRoute>
+}>
           {/* Default redirect based on role */}
           <Route index element={
             role === 'admin' ? <Navigate to="/dashboard/all-users" replace /> :

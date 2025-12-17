@@ -76,17 +76,17 @@ export default function MyWishlist() {
 
   if (isLoading && wishlistItems.length === 0) {
     return (
-      <DashboardLayout>
+     
         <div className="p-8 text-center">
           <span className="loading loading-spinner loading-lg text-primary"></span>
           <p className="mt-4 text-muted">Loading your wishlist...</p>
         </div>
-      </DashboardLayout>
+     
     );
   }
 
   return (
-    <DashboardLayout>
+ 
       <div className="p-6">
         {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
@@ -357,6 +357,6 @@ export default function MyWishlist() {
           </>
         )}
       </div>
-    </DashboardLayout>
+    
   );
 }

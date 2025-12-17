@@ -1,4 +1,4 @@
-// layout/DashboardLayout.jsx
+// layout/DashboardLayout.jsx - CORRECTED VERSION (footer removed)
 import React, { useState, useEffect } from 'react';
 import { Link, Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
@@ -239,7 +239,7 @@ export default function DashboardLayout() {
             </div>
           </nav>
 
-          {/* Footer */}
+          {/* Sidebar Footer - KEEP THIS (it's part of sidebar) */}
           <div className="p-4 border-t border-base-300">
             <div className="space-y-3">
               <div className="flex items-center justify-between">
@@ -362,45 +362,16 @@ export default function DashboardLayout() {
         </div>
 
         {/* Page Content */}
-        <main className="min-h-[calc(100vh-140px)] p-6">
+        <main className="min-h-[calc(100vh-64px)] p-6"> {/* Changed from 140px to 64px */}
           <div className="animate-fade-in">
             <Outlet />
           </div>
         </main>
 
-        {/* Footer */}
-        <footer className="border-t border-base-300 bg-base-200">
-          <div className="px-6 py-4">
-            <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-              <div className="text-sm text-muted">
-                <p>
-                  © {new Date().getFullYear()} BookCourier. 
-                  <span className="hidden md:inline"> All rights reserved.</span>
-                </p>
-              </div>
-              
-              <div className="flex items-center gap-6">
-                <Link to="/privacy" className="text-sm link link-hover">
-                  Privacy Policy
-                </Link>
-                <Link to="/terms" className="text-sm link link-hover">
-                  Terms of Service
-                </Link>
-                <Link to="/help" className="text-sm link link-hover">
-                  Help Center
-                </Link>
-              </div>
-              
-              <div className="text-sm text-muted">
-                <span className="hidden md:inline">Server Status: </span>
-                <span className="badge badge-success badge-sm">Online</span>
-              </div>
-            </div>
-          </div>
-        </footer>
+        {/* NO FOOTER HERE - MainLayout already provides footer */}
       </div>
 
-      {/* Mobile Bottom Navigation (for small screens) */}
+      {/* Mobile Bottom Navigation (for small screens) - KEEP THIS */}
       <div className="md:hidden fixed bottom-0 left-0 right-0 bg-base-100 border-t border-base-300 z-30">
         <div className="flex justify-around items-center py-2">
           <Link 

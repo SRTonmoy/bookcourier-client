@@ -63,7 +63,7 @@ export default function MyBooks() {
   if (role !== 'librarian') return <div className="p-8 text-error">Access denied. Librarian only.</div>;
 
   return (
-    <DashboardLayout>
+    
       <div className="p-6">
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
@@ -195,6 +195,6 @@ export default function MyBooks() {
           </div>
         )}
       </div>
-    </DashboardLayout>
+ 
   );
 }

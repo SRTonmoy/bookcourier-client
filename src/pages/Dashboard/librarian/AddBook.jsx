@@ -111,7 +111,7 @@ export default function AddBook() {
   }
 
   return (
-    <DashboardLayout>
+    
       <div className="p-6 max-w-4xl mx-auto">
         <h2 className="text-2xl font-bold mb-6">Add New Book</h2>
         
@@ -342,6 +342,6 @@ export default function AddBook() {
           </ul>
         </div>
       </div>
-    </DashboardLayout>
+   
   );
 }

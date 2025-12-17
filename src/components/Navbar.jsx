@@ -51,13 +51,13 @@ export default function Navbar() {
         <ul className="menu menu-horizontal gap-2">
           <li><NavLink to="/" className={navLinkClass}>Home</NavLink></li>
           <li><NavLink to="/books" className={navLinkClass}>All Books</NavLink></li>
-          {user && (
+          {/* {user && ( */}
             <li>
               <NavLink to="/dashboard" className={navLinkClass}>
                 Dashboard
               </NavLink>
             </li>
-          )}
+          {/* )} */}
         </ul>
       </div>
 

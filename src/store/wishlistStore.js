@@ -1,4 +1,4 @@
-// store/wishlistStore.js
+// store/wishlistStore.js - UPDATED TO MATCH YOUR SERVER
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import axiosSecure from '../api/axiosSecure';
@@ -11,131 +11,136 @@ export const useWishlistStore = create(
       isLoading: false,
       error: null,
       
-      // Actions
-      addToWishlist: async (bookData) => {
-        try {
-          set({ isLoading: true, error: null });
-          
-          const response = await axiosSecure.post('/wishlist', bookData);
-          
-          if (response.data.success) {
-            // Fetch updated wishlist
-            await get().fetchWishlist();
-            
-            // Show success message
-            if (typeof window !== 'undefined') {
-              window.dispatchEvent(new CustomEvent('show-toast', {
-                detail: { 
-                  type: 'success', 
-                  message: 'Added to wishlist!' 
-                }
-              }));
-            }
-            
-            return { success: true, message: response.data.message };
-          }
-          
-          throw new Error(response.data.message || 'Failed to add to wishlist');
-          
-        } catch (error) {
-          const errorMessage = error.response?.data?.message || error.message;
-          set({ error: errorMessage });
-          
-          // Show error message
-          if (typeof window !== 'undefined') {
-            window.dispatchEvent(new CustomEvent('show-toast', {
-              detail: { 
-                type: 'error', 
-                message: errorMessage 
-              }
-            }));
-          }
-          
-          return { success: false, message: errorMessage };
-          
-        } finally {
-          set({ isLoading: false });
-        }
-      },
+      // ========== MATCHING YOUR SERVER ENDPOINTS ==========
       
-      removeFromWishlist: async (bookId) => {
-        try {
-          set({ isLoading: true, error: null });
-          
-          const response = await axiosSecure.delete(`/wishlist/${bookId}`);
-          
-          if (response.data.success) {
-            // Update local state immediately
-            set(state => ({
-              wishlistItems: state.wishlistItems.filter(item => item.bookId !== bookId)
-            }));
-            
-            // Show success message
-            if (typeof window !== 'undefined') {
-              window.dispatchEvent(new CustomEvent('show-toast', {
-                detail: { 
-                  type: 'success', 
-                  message: 'Removed from wishlist!' 
-                }
-              }));
-            }
-            
-            return { success: true, message: response.data.message };
-          }
-          
-          throw new Error(response.data.message || 'Failed to remove from wishlist');
-          
-        } catch (error) {
-          const errorMessage = error.response?.data?.message || error.message;
-          set({ error: errorMessage });
-          
-          // Show error message
-          if (typeof window !== 'undefined') {
-            window.dispatchEvent(new CustomEvent('show-toast', {
-              detail: { 
-                type: 'error', 
-                message: errorMessage 
-              }
-            }));
-          }
-          
-          return { success: false, message: errorMessage };
-          
-        } finally {
-          set({ isLoading: false });
-        }
-      },
-      
+      // Get user's wishlist - FIXED: Matches "/wishlist/my"
       fetchWishlist: async () => {
         try {
           set({ isLoading: true, error: null });
           
-          const response = await axiosSecure.get('/wishlist/my');
+          console.log('Fetching wishlist...');
+          const response = await axiosSecure.get('/wishlist/my'); // Changed from '/wishlist'
+          
+          console.log('Wishlist response:', response.data);
           
           if (response.data.success) {
             set({ 
-              wishlistItems: response.data.wishlist || [],
+              wishlistItems: response.data.wishlist || [], // Matches server response
               error: null 
             });
           } else {
-            throw new Error('Failed to fetch wishlist');
+            set({ wishlistItems: [] });
           }
           
         } catch (error) {
-          const errorMessage = error.response?.data?.message || error.message;
+          console.error('Fetch wishlist error:', error);
+          const errorMessage = error.response?.data?.message || error.message || 'Failed to fetch wishlist';
           set({ 
             error: errorMessage,
             wishlistItems: [] 
           });
-          console.error('Fetch wishlist error:', error);
         } finally {
           set({ isLoading: false });
         }
       },
       
+      // Add book to wishlist - FIXED: Matches server data structure
+      addToWishlist: async (bookData) => {
+        try {
+          set({ isLoading: true, error: null });
+          
+          console.log('Adding to wishlist:', bookData);
+          const response = await axiosSecure.post('/wishlist', bookData);
+          
+          console.log('Add response:', response.data);
+          
+          if (response.data.success) {
+            // Fetch fresh data from server to ensure consistency
+            await get().fetchWishlist();
+            
+            // Show success
+            window.dispatchEvent(new CustomEvent('show-toast', {
+              detail: { 
+                type: 'success', 
+                message: 'Added to wishlist!' 
+              }
+            }));
+            
+            return { success: true, data: response.data };
+          }
+          
+          throw new Error(response.data.message || 'Failed to add');
+          
+        } catch (error) {
+          console.error('Add to wishlist error:', error);
+          const errorMessage = error.response?.data?.message || error.message || 'Failed to add to wishlist';
+          set({ error: errorMessage });
+          
+          window.dispatchEvent(new CustomEvent('show-toast', {
+            detail: { 
+              type: 'error', 
+              message: errorMessage 
+            }
+          }));
+          
+          return { success: false, message: errorMessage };
+          
+        } finally {
+          set({ isLoading: false });
+        }
+      },
+      
+      // Remove from wishlist - FIXED: Matches "/wishlist/:bookId"
+      removeFromWishlist: async (bookId) => {
+        try {
+          set({ isLoading: true, error: null });
+          
+          console.log('Removing from wishlist:', bookId);
+          const response = await axiosSecure.delete(`/wishlist/${bookId}`);
+          
+          console.log('Remove response:', response.data);
+          
+          if (response.data.success) {
+            // Remove from local state immediately
+            set(state => ({
+              wishlistItems: state.wishlistItems.filter(item => item.bookId !== bookId)
+            }));
+            
+            window.dispatchEvent(new CustomEvent('show-toast', {
+              detail: { 
+                type: 'success', 
+                message: 'Removed from wishlist!' 
+              }
+            }));
+            
+            return { success: true };
+          }
+          
+          throw new Error(response.data.message || 'Failed to remove');
+          
+        } catch (error) {
+          console.error('Remove from wishlist error:', error);
+          const errorMessage = error.response?.data?.message || error.message || 'Failed to remove';
+          set({ error: errorMessage });
+          
+          window.dispatchEvent(new CustomEvent('show-toast', {
+            detail: { 
+              type: 'error', 
+              message: errorMessage 
+            }
+          }));
+          
+          return { success: false, message: errorMessage };
+          
+        } finally {
+          set({ isLoading: false });
+        }
+      },
+      
+      // Check if book is in wishlist - FIXED: Matches "/wishlist/check/:bookId"
       checkInWishlist: async (bookId) => {
         try {
-          if (!bookId) return false;
+          if (!bookId || bookId === "undefined") return false;
           
           const response = await axiosSecure.get(`/wishlist/check/${bookId}`);
           
@@ -151,6 +156,49 @@ export const useWishlistStore = create(
         }
       },
       
+      // Clear entire wishlist - FIXED: Matches "/wishlist/clear/all"
+      clearWishlist: async () => {
+        try {
+          set({ isLoading: true, error: null });
+          
+          const response = await axiosSecure.delete('/wishlist/clear/all');
+          
+          console.log('Clear response:', response.data);
+          
+          if (response.data.success) {
+            set({ wishlistItems: [] });
+            
+            window.dispatchEvent(new CustomEvent('show-toast', {
+              detail: { 
+                type: 'success', 
+                message: `Cleared ${response.data.deletedCount} items from wishlist!` 
+              }
+            }));
+            
+            return { success: true };
+          }
+          
+          throw new Error('Failed to clear wishlist');
+          
+        } catch (error) {
+          const errorMessage = error.response?.data?.message || error.message;
+          set({ error: errorMessage });
+          
+          window.dispatchEvent(new CustomEvent('show-toast', {
+            detail: { 
+              type: 'error', 
+              message: errorMessage 
+            }
+          }));
+          
+          return { success: false, message: errorMessage };
+          
+        } finally {
+          set({ isLoading: false });
+        }
+      },
+      
+      // Helper methods
       getWishlistCount: () => {
         return get().wishlistItems.length;
       },
@@ -160,58 +208,21 @@ export const useWishlistStore = create(
         return get().wishlistItems.some(item => item.bookId === bookId);
       },
       
-      clearWishlist: async () => {
-        try {
-          set({ isLoading: true, error: null });
-          
-          const response = await axiosSecure.delete('/wishlist/clear/all');
-          
-          if (response.data.success) {
-            set({ wishlistItems: [] });
-            
-            // Show success message
-            if (typeof window !== 'undefined') {
-              window.dispatchEvent(new CustomEvent('show-toast', {
-                detail: { 
-                  type: 'success', 
-                  message: 'Wishlist cleared!' 
-                }
-              }));
-            }
-            
-            return { success: true, message: response.data.message };
-          }
-          
-          throw new Error('Failed to clear wishlist');
-          
-        } catch (error) {
-          const errorMessage = error.response?.data?.message || error.message;
-          set({ error: errorMessage });
-          
-          // Show error message
-          if (typeof window !== 'undefined') {
-            window.dispatchEvent(new CustomEvent('show-toast', {
-              detail: { 
-                type: 'error', 
-                message: errorMessage 
-              }
-            }));
-          }
-          
-          return { success: false, message: errorMessage };
-          
-        } finally {
-          set({ isLoading: false });
-        }
-      },
-      
       clearError: () => set({ error: null })
     }),
     {
       name: 'bookcourier-wishlist',
       partialize: (state) => ({ 
         wishlistItems: state.wishlistItems 
-      })
+      }),
+      onRehydrateStorage: () => {
+        // Optional: Log when store is rehydrated
+        return (state) => {
+          if (state) {
+            console.log('Wishlist store rehydrated with', state.wishlistItems?.length || 0, 'items');
+          }
+        };
+      }
     }
   )
 );

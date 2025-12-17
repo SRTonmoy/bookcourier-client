@@ -20,6 +20,15 @@ export default function MyWishlist() {
 
   const [selectedItems, setSelectedItems] = useState(new Set());
   const [isClearing, setIsClearing] = useState(false);
+  // Add right after your existing useState hooks in MyWishlist.jsx
+useEffect(() => {
+  console.log('Wishlist State Debug:', {
+    items: wishlistItems,
+    itemsLength: wishlistItems?.length,
+    isLoading,
+    firstItem: wishlistItems[0]
+  });
+}, [wishlistItems, isLoading]);
 
   useEffect(() => {
     fetchWishlist();
@@ -74,16 +83,16 @@ export default function MyWishlist() {
     }));
   };
 
-  if (isLoading && wishlistItems.length === 0) {
-    return (
-     
-        <div className="p-8 text-center">
-          <span className="loading loading-spinner loading-lg text-primary"></span>
-          <p className="mt-4 text-muted">Loading your wishlist...</p>
-        </div>
-     
-    );
-  }
+ if (isLoading) {
+  return (
+    <div className="min-h-[60vh] flex items-center justify-center">
+      <div className="text-center">
+        <span className="loading loading-spinner loading-lg text-primary"></span>
+        <p className="mt-4 text-muted">Loading your wishlist...</p>
+      </div>
+    </div>
+  );
+}
 
   return (
  

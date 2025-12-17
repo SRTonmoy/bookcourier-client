@@ -1,77 +1,59 @@
-// components/Navbar.jsx - UPDATED
-import React, { useState } from 'react';
-import { Link, NavLink } from 'react-router-dom';
-import { useAuth } from '../hooks/useAuth';
-import { Menu, X } from 'lucide-react';
-import ThemeToggle from './ThemeToggle';
+// components/Navbar.jsx
+import React, { useState } from "react";
+import { Link, NavLink } from "react-router-dom";
+import { Menu, X, Heart } from "lucide-react";
+import { useAuth } from "../hooks/useAuth";
+import ThemeToggle from "./ThemeToggle";
+import { useWishlistStore } from "../store/wishlistStore";
 
 export default function Navbar() {
   const { user, logout } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { getWishlistCount } = useWishlistStore();
 
   const handleLogout = async () => {
     await logout();
     setMobileMenuOpen(false);
   };
 
+  const wishlistCount = getWishlistCount();
+
+  const navLinkClass = ({ isActive }) =>
+    `rounded-lg px-3 py-2 ${
+      isActive
+        ? "bg-primary text-primary-content"
+        : "hover:bg-base-300"
+    }`;
+
   return (
-    <nav className="navbar bg-base-100 shadow-lg sticky top-0 z-50">
+    <nav className="navbar bg-base-100 shadow sticky top-0 z-50">
+      {/* LEFT */}
       <div className="navbar-start">
-        {/* Mobile Menu Button */}
-        <div className="dropdown md:hidden">
-          <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="btn btn-ghost btn-circle"
-          >
-            {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
-        </div>
+        {/* Mobile menu button */}
+        <button
+          className="btn btn-ghost btn-circle md:hidden"
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+        >
+          {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+        </button>
 
         {/* Logo */}
-        <Link to="/" className="flex items-center gap-3 px-4">
-          <div className="w-10 h-10 bg-gradient-to-br from-primary to-secondary text-base-100 rounded-full flex items-center justify-center font-bold text-xl">
+        <Link to="/" className="flex items-center gap-3 px-3">
+          <div className="w-10 h-10 rounded-full bg-primary text-primary-content flex items-center justify-center font-bold">
             BC
           </div>
-          <div>
-            <span className="font-bold text-xl bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-              BookCourier
-            </span>
-            <p className="text-xs text-muted">Library-to-Home Delivery</p>
-          </div>
+          <span className="font-bold text-xl">BookCourier</span>
         </Link>
       </div>
 
-      {/* Desktop Navigation */}
+      {/* CENTER (Desktop links) */}
       <div className="navbar-center hidden md:flex">
-        <ul className="menu menu-horizontal px-1 gap-1">
-          <li>
-            <NavLink 
-              to="/" 
-              className={({ isActive }) => 
-                `rounded-lg ${isActive ? 'bg-primary text-primary-content' : 'hover:bg-base-300'}`
-              }
-            >
-              Home
-            </NavLink>
-          </li>
-          <li>
-            <NavLink 
-              to="/books" 
-              className={({ isActive }) => 
-                `rounded-lg ${isActive ? 'bg-primary text-primary-content' : 'hover:bg-base-300'}`
-              }
-            >
-              All Books
-            </NavLink>
-          </li>
+        <ul className="menu menu-horizontal gap-2">
+          <li><NavLink to="/" className={navLinkClass}>Home</NavLink></li>
+          <li><NavLink to="/books" className={navLinkClass}>All Books</NavLink></li>
           {user && (
             <li>
-              <NavLink 
-                to="/dashboard" 
-                className={({ isActive }) => 
-                  `rounded-lg ${isActive ? 'bg-primary text-primary-content' : 'hover:bg-base-300'}`
-                }
-              >
+              <NavLink to="/dashboard" className={navLinkClass}>
                 Dashboard
               </NavLink>
             </li>
@@ -79,52 +61,49 @@ export default function Navbar() {
         </ul>
       </div>
 
-      {/* Right Side: Theme Toggle & User */}
-      <div className="navbar-end gap-4 px-4">
-        {/* Theme Toggle */}
+      {/* RIGHT */}
+      <div className="navbar-end gap-3">
+        {/* Wishlist icon */}
+        {user && (
+          <Link
+            to="/dashboard/wishlist"
+            className="btn btn-ghost btn-circle relative"
+          >
+            <Heart size={22} />
+            {wishlistCount > 0 && (
+              <span className="absolute -top-1 -right-1 badge badge-primary badge-xs">
+                {wishlistCount}
+              </span>
+            )}
+          </Link>
+        )}
+
+        {/* Theme toggle */}
         <ThemeToggle />
-        
-        {/* User Profile or Login */}
+
+        {/* User / Auth */}
         {user ? (
           <div className="dropdown dropdown-end">
-            <div 
-              tabIndex={0} 
-              className="btn btn-ghost btn-circle avatar"
-              role="button"
-              aria-label="User menu"
-            >
-              <div className="w-10 h-10 rounded-full ring-2 ring-primary ring-offset-2 ring-offset-base-100">
-                <img 
-                  src={user.photoURL || '/default-avatar.png'} 
-                  alt={user.displayName || 'User'} 
-                  className="w-full h-full object-cover"
-                  onError={(e) => {
-                    e.target.onerror = null;
-                    e.target.src = '/default-avatar.png';
-                  }}
+            <label tabIndex={0} className="btn btn-ghost btn-circle avatar">
+              <div className="w-10 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
+                <img
+                  src={user.photoURL || "/default-avatar.png"}
+                  alt="user"
                 />
               </div>
-            </div>
-            <ul 
-              tabIndex={0} 
-              className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52 mt-2"
+            </label>
+            <ul
+              tabIndex={0}
+              className="menu dropdown-content mt-3 p-2 shadow bg-base-100 rounded-box w-52"
             >
               <li className="px-4 py-2 border-b">
-                <div className="font-semibold">{user.displayName || 'User'}</div>
-                <div className="text-sm text-muted">{user.email}</div>
+                <p className="font-semibold">{user.displayName || "User"}</p>
+                <p className="text-xs">{user.email}</p>
               </li>
+              <li><Link to="/dashboard">Dashboard</Link></li>
+              <li><Link to="/dashboard/wishlist">Wishlist</Link></li>
               <li>
-                <Link to="/dashboard" className="py-3">
-                  Dashboard
-                </Link>
-              </li>
-              <li>
-                <Link to="/dashboard/my-profile" className="py-3">
-                  My Profile
-                </Link>
-              </li>
-              <li>
-                <button onClick={handleLogout} className="py-3 text-error">
+                <button onClick={handleLogout} className="text-error">
                   Logout
                 </button>
               </li>
@@ -132,95 +111,49 @@ export default function Navbar() {
           </div>
         ) : (
           <div className="flex gap-2">
-            <Link to="/login" className="btn btn-outline btn-sm">
-              Login
-            </Link>
-            <Link to="/register" className="btn btn-primary btn-sm">
-              Register
-            </Link>
+            <Link to="/login" className="btn btn-outline btn-sm">Login</Link>
+            <Link to="/register" className="btn btn-primary btn-sm">Register</Link>
           </div>
         )}
       </div>
 
-      {/* Mobile Menu */}
+      {/* MOBILE MENU */}
       {mobileMenuOpen && (
-        <div className="md:hidden absolute top-full left-0 right-0 bg-base-100 shadow-lg border-t">
+        <div className="md:hidden absolute top-full left-0 right-0 bg-base-100 border-t shadow">
           <ul className="menu p-4 space-y-2">
             <li>
-              <NavLink 
-                to="/" 
-                onClick={() => setMobileMenuOpen(false)}
-                className={({ isActive }) => 
-                  `block py-3 rounded-lg ${isActive ? 'bg-primary text-primary-content' : ''}`
-                }
-              >
+              <NavLink to="/" onClick={() => setMobileMenuOpen(false)}>
                 Home
               </NavLink>
             </li>
             <li>
-              <NavLink 
-                to="/books" 
-                onClick={() => setMobileMenuOpen(false)}
-                className={({ isActive }) => 
-                  `block py-3 rounded-lg ${isActive ? 'bg-primary text-primary-content' : ''}`
-                }
-              >
+              <NavLink to="/books" onClick={() => setMobileMenuOpen(false)}>
                 All Books
               </NavLink>
             </li>
+
             {user ? (
               <>
                 <li>
-                  <NavLink 
-                    to="/dashboard" 
-                    onClick={() => setMobileMenuOpen(false)}
-                    className={({ isActive }) => 
-                      `block py-3 rounded-lg ${isActive ? 'bg-primary text-primary-content' : ''}`
-                    }
-                  >
+                  <NavLink to="/dashboard" onClick={() => setMobileMenuOpen(false)}>
                     Dashboard
                   </NavLink>
                 </li>
                 <li>
-                  <NavLink 
-                    to="/dashboard/my-profile" 
-                    onClick={() => setMobileMenuOpen(false)}
-                    className={({ isActive }) => 
-                      `block py-3 rounded-lg ${isActive ? 'bg-primary text-primary-content' : ''}`
-                    }
-                  >
-                    My Profile
+                  <NavLink to="/dashboard/wishlist" onClick={() => setMobileMenuOpen(false)}>
+                    Wishlist ({wishlistCount})
                   </NavLink>
                 </li>
                 <li>
-                  <button 
-                    onClick={handleLogout}
-                    className="block w-full text-left py-3 text-error rounded-lg"
-                  >
+                  <button onClick={handleLogout} className="text-error">
                     Logout
                   </button>
                 </li>
               </>
             ) : (
               <>
-                <li>
-                  <Link 
-                    to="/login" 
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="block py-3 rounded-lg"
-                  >
-                    Login
-                  </Link>
-                </li>
-                <li>
-                  <Link 
-                    to="/register" 
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="block py-3 rounded-lg bg-primary text-primary-content"
-                  >
-                    Register
-                  </Link>
-                </li>
+                <li><Link to="/login">Login</Link></li>
+                <li><Link to="/register">Register</Link></li>
               </>
             )}
           </ul>

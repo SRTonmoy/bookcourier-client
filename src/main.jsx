@@ -9,6 +9,7 @@ import { AuthProvider } from './context/AuthProvider';
 import { ThemeProvider } from './context/ThemeProvider';
 import 'leaflet/dist/leaflet.css';
 import './styles/leaflet-fix.css'; 
+import Toast from './components/Toast';
 
 const queryClient = new QueryClient();
 
@@ -19,6 +20,7 @@ createRoot(document.getElementById('root')).render(
         <ThemeProvider>
           <AuthProvider>
             <App />
+             <Toast />
           </AuthProvider>
         </ThemeProvider>
       </BrowserRouter>

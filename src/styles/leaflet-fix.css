@@ -1,0 +1,54 @@
+/* styles/leaflet-fix.css */
+@import 'leaflet/dist/leaflet.css';
+
+/* Fix for default marker icons */
+.leaflet-default-icon-path {
+  background-image: url(https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png);
+}
+
+.leaflet-default-shadow-path {
+  background-image: url(https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png);
+}
+
+/* Custom map styles */
+.leaflet-container {
+  font-family: inherit;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.leaflet-popup-content-wrapper {
+  border-radius: 10px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+.leaflet-popup-content {
+  margin: 16px 20px;
+  font-size: 14px;
+}
+
+.leaflet-control-attribution {
+  font-size: 10px;
+  background-color: rgba(255, 255, 255, 0.8);
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+/* Dark mode support */
+[data-theme="dark"] .leaflet-tile {
+  filter: brightness(0.6) invert(1) contrast(3) hue-rotate(200deg) saturate(0.3) brightness(0.7);
+}
+
+[data-theme="dark"] .leaflet-container {
+  background: #1a202c;
+}
+
+[data-theme="dark"] .leaflet-popup-content-wrapper {
+  background-color: #2d3748;
+  color: #e2e8f0;
+}
+
+[data-theme="dark"] .leaflet-control-attribution {
+  background-color: rgba(45, 55, 72, 0.8);
+  color: #a0aec0;
+}

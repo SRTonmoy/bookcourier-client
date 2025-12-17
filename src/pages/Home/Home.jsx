@@ -1,24 +1,24 @@
-// Home.jsx - FIXED (remove MainLayout import and wrapper)
 import React from 'react';
 import BookCard from '../../components/BookCard';
+import axiosPublic from '../../api/axiosPublic';
 import { Link } from 'react-router-dom';
 import { getBooks } from "../../services/bookService";
+
 import CoverageMap from "../../components/CoverageMap";
 
 export default function Home(){
   const [books, setBooks] = React.useState([]);
 
   React.useEffect(() => {
-    getBooks()
-      .then(data => {
-        console.log("BOOKS FROM API:", data);
-        setBooks(data.slice(0, 6));
-      })
-      .catch(console.error);
-  }, []);
+  getBooks()
+    .then(data => {
+      console.log("BOOKS FROM API:", data);
+      setBooks(data.slice(0, 6));
+    })
+    .catch(console.error);
+}, []);
 
   return (
-    // NO MainLayout wrapper here!
     <div>
       <section className="hero min-h-[60vh]" style={{ backgroundImage: 'linear-gradient(0deg, rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url(https://picsum.photos/1200/400?grayscale)' }}>
         <div className="hero-content text-center text-neutral-content">
@@ -45,13 +45,16 @@ export default function Home(){
           <div className="card p-6 shadow">Easy Returns — schedule return pickups.</div>
         </div>
       </section>
-      
       <section className="p-8 bg-base-100">
-        <div>
-          <h2 className="text-2xl font-bold my-6">Book Delivery Coverage</h2>
-          <CoverageMap />
-        </div>
-      </section>
+  <div>
+    <h2 className="text-3xl font-bold mb-6 text-center">Book Delivery Coverage</h2>
+    <p className="text-center text-muted mb-8 max-w-2xl mx-auto">
+      We serve 8 major cities across Bangladesh with 45+ partner libraries. 
+      Click on the map to explore our service areas.
+    </p>
+    <CoverageMap />
+  </div>
+</section>
     </div>
   );
 }

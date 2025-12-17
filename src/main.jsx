@@ -7,6 +7,8 @@ import App from './App';
 import './index.css';
 import { AuthProvider } from './context/AuthProvider';
 import { ThemeProvider } from './context/ThemeProvider';
+import 'leaflet/dist/leaflet.css';
+import './styles/leaflet-fix.css'; 
 
 const queryClient = new QueryClient();
 

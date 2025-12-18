@@ -15,92 +15,7 @@ import axiosSecure from '../../../api/axiosSecure';
 import { format } from 'date-fns';
 import { invoiceService } from '../../../services/invoiceService';
 
-// Mock data - defined OUTSIDE component
-const mockInvoices = [
-  {
-    id: 'INV-2024-001',
-    orderId: 'ORD-12345',
-    customer: 'John Doe',
-    customerEmail: 'john@example.com',
-    date: '2024-12-15',
-    dueDate: '2024-12-22',
-    amount: 129.99,
-    tax: 12.99,
-    total: 142.98,
-    status: 'paid',
-    items: [
-      { name: 'The Great Gatsby', quantity: 1, price: 24.99 },
-      { name: 'To Kill a Mockingbird', quantity: 1, price: 22.99 },
-      { name: 'Atomic Habits', quantity: 1, price: 18.99 },
-      { name: 'Delivery Fee', quantity: 1, price: 5.00 },
-      { name: 'Service Fee', quantity: 1, price: 3.00 }
-    ],
-    paymentMethod: 'Credit Card',
-    transactionId: 'TXN-789012',
-    notes: 'Thank you for your business!'
-  },
-  {
-    id: 'INV-2024-002',
-    orderId: 'ORD-12346',
-    customer: 'Jane Smith',
-    customerEmail: 'jane@example.com',
-    date: '2024-12-10',
-    dueDate: '2024-12-17',
-    amount: 89.97,
-    tax: 9.00,
-    total: 98.97,
-    status: 'pending',
-    items: [
-      { name: 'Deep Work', quantity: 1, price: 19.99 },
-      { name: 'The Silent Patient', quantity: 1, price: 16.99 },
-      { name: 'Delivery Fee', quantity: 1, price: 5.00 }
-    ],
-    paymentMethod: 'PayPal',
-    transactionId: 'TXN-789013',
-    notes: 'Payment due in 7 days'
-  },
-  {
-    id: 'INV-2024-003',
-    orderId: 'ORD-12347',
-    customer: 'Bob Johnson',
-    customerEmail: 'bob@example.com',
-    date: '2024-12-05',
-    dueDate: '2024-12-12',
-    amount: 45.98,
-    tax: 4.60,
-    total: 50.58,
-    status: 'overdue',
-    items: [
-      { name: 'The Midnight Library', quantity: 1, price: 15.99 },
-      { name: 'Delivery Fee', quantity: 1, price: 5.00 }
-    ],
-    paymentMethod: 'Bank Transfer',
-    transactionId: null,
-    notes: 'Please make payment ASAP'
-  },
-  {
-    id: 'INV-2024-004',
-    orderId: 'ORD-12348',
-    customer: 'Alice Brown',
-    customerEmail: 'alice@example.com',
-    date: '2024-11-28',
-    dueDate: '2024-12-05',
-    amount: 157.95,
-    tax: 15.80,
-    total: 173.75,
-    status: 'paid',
-    items: [
-      { name: 'Project Hail Mary', quantity: 1, price: 24.99 },
-      { name: 'Dune', quantity: 1, price: 22.99 },
-      { name: 'The Hobbit', quantity: 1, price: 18.99 },
-      { name: 'Annual Subscription', quantity: 1, price: 49.99 },
-      { name: 'Delivery Fee', quantity: 1, price: 5.00 }
-    ],
-    paymentMethod: 'Credit Card',
-    transactionId: 'TXN-789014',
-    notes: 'Annual subscription included'
-  }
-];
+
 
 export default function MyInvoices() {
   const [invoices, setInvoices] = useState([]);
@@ -110,57 +25,77 @@ export default function MyInvoices() {
   const [selectedInvoice, setSelectedInvoice] = useState(null);
   const [showInvoiceModal, setShowInvoiceModal] = useState(false);
 
-  // Fetch invoices function
-  const fetchInvoices = async (refresh = false) => {
-    setLoading(true);
-    try {
-      // Use real service with your data
-      const data = await invoiceService.getMyInvoices();
-      
-      if (!data || data.length === 0) {
-        console.log('No invoices from API, using mock data...');
-        setInvoices(mockInvoices);
-      } else {
-        // Transform API data to match our format
-        const formattedInvoices = data.map(invoice => ({
-          id: invoice.invoiceId,
+ 
+const fetchInvoices = async () => {
+  setLoading(true);
+  try {
+    
+    const response = await axiosSecure.get('/invoices/my');
+    console.log('API Response:', response.data);
+    
+    if (response.data.success && response.data.invoices) {
+      // Transform the API data to match your frontend format
+      const formattedInvoices = response.data.invoices.map(invoice => {
+        // Determine status based on invoice data
+        let status = invoice.status || 'pending';
+        
+        // If due date has passed and status is not paid, mark as overdue
+        if (status === 'pending' && invoice.dueDate) {
+          const dueDate = new Date(invoice.dueDate);
+          const today = new Date();
+          if (dueDate < today) {
+            status = 'overdue';
+          }
+        }
+        
+        return {
+          id: invoice.invoiceId || `INV-${invoice._id?.toString().slice(-8)}`,
           invoiceId: invoice.invoiceId,
-          orderId: invoice.orderId,
-          customer: invoice.customerName || invoice.userName,
-          customerEmail: invoice.customerEmail || invoice.userEmail,
-          customerPhone: invoice.customerPhone || invoice.phone,
-          customerAddress: invoice.customerAddress || invoice.address,
-          date: invoice.invoiceDate || invoice.orderDate || invoice.createdAt,
-          dueDate: invoice.dueDate || new Date(new Date(invoice.invoiceDate).getTime() + 7 * 24 * 60 * 60 * 1000),
-          amount: invoice.subtotal || invoice.amount,
-          tax: invoice.taxAmount || (invoice.amount * 0.10).toFixed(2),
-          total: invoice.totalAmount || invoice.amount,
-          status: invoice.status || 'pending',
-          items: invoice.items || [{
-            name: invoice.bookName || 'Book Purchase',
-            quantity: 1,
-            price: invoice.bookPrice || invoice.amount,
-            total: invoice.amount
-          }],
-          paymentMethod: invoice.paymentMethod || 'cash_on_delivery',
+          orderId: invoice.orderId?.toString() || `ORD-${invoice._id?.toString().slice(-6)}`,
+          customer: invoice.customerName || 'Customer',
+          customerEmail: invoice.customerEmail || 'No email',
+          customerPhone: invoice.customerPhone,
+          customerAddress: invoice.customerAddress,
+          date: invoice.invoiceDate || invoice.createdAt || new Date().toISOString(),
+          dueDate: invoice.dueDate || new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+          amount: invoice.subtotal || invoice.amount || 0,
+          tax: invoice.taxAmount || 0,
+          total: invoice.totalAmount || invoice.amount || 0,
+          status: status,
+          items: invoice.items || [
+            {
+              name: invoice.bookName || 'Book Purchase',
+              description: `By ${invoice.bookAuthor || 'Unknown Author'}`,
+              quantity: 1,
+              price: invoice.bookPrice || invoice.amount || 0,
+              total: invoice.amount || 0
+            }
+          ],
+          paymentMethod: invoice.paymentMethod || 'Not specified',
           transactionId: null,
           notes: invoice.notes || `Order #${invoice.orderId?.toString().slice(-6) || ''}`,
           bookId: invoice.bookId,
           bookName: invoice.bookName,
           bookAuthor: invoice.bookAuthor,
           bookImage: invoice.bookImage
-        }));
-        
-        setInvoices(formattedInvoices);
-      }
-    } catch (error) {
-      console.error('Failed to load invoices:', error);
-      // Fallback to mock data for demo
+        };
+      });
+      
+      console.log('Formatted invoices:', formattedInvoices);
+      setInvoices(formattedInvoices);
+    } else {
+      console.log('No invoices found, using mock data');
+      // Fallback to mock data if API returns no data
       setInvoices(mockInvoices);
-    } finally {
-      setLoading(false);
     }
-  };
+  } catch (error) {
+    console.error('Failed to load invoices:', error);
+    // For development, show mock data
+    setInvoices(mockInvoices);
+  } finally {
+    setLoading(false);
+  }
+};
 
   useEffect(() => {
     fetchInvoices();
@@ -444,73 +379,83 @@ export default function MyInvoices() {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredInvoices.length === 0 ? (
-                    <tr>
-                      <td colSpan="6" className="text-center py-8">
-                        <div className="flex flex-col items-center justify-center">
-                          <FileText size={48} className="text-base-300 mb-4" />
-                          <p className="text-muted">No invoices found</p>
-                        </div>
-                      </td>
-                    </tr>
-                  ) : (
-                    filteredInvoices.map((invoice) => (
-                      <tr key={invoice.id} className="hover">
-                        <td>
-                          <div className="font-mono font-bold">{invoice.id}</div>
-                          <div className="text-xs text-muted">{invoice.orderId}</div>
-                        </td>
-                        <td>
-                          <div>{format(new Date(invoice.date), 'MMM dd, yyyy')}</div>
-                          <div className="text-xs text-muted">
-                            Due: {format(new Date(invoice.dueDate), 'MMM dd')}
-                          </div>
-                        </td>
-                        <td>
-                          <div>{invoice.customer}</div>
-                          <div className="text-xs text-muted">{invoice.customerEmail}</div>
-                        </td>
-                        <td>
-                          <div className="font-bold">${invoice.total.toFixed(2)}</div>
-                          <div className="text-xs text-muted">
-                            ${invoice.amount.toFixed(2)} + ${invoice.tax.toFixed(2)} tax
-                          </div>
-                        </td>
-                        <td>
-                          <div className={`badge badge-${getStatusColor(invoice.status)} gap-1`}>
-                            {getStatusIcon(invoice.status)}
-                            {invoice.status.toUpperCase()}
-                          </div>
-                        </td>
-                        <td>
-                          <div className="flex gap-2">
-                            <button
-                              onClick={() => handleViewInvoice(invoice)}
-                              className="btn btn-ghost btn-xs"
-                              title="View Invoice"
-                            >
-                              <Eye size={14} />
-                            </button>
-                            <button
-                              onClick={() => generatePDF(invoice)}
-                              className="btn btn-ghost btn-xs"
-                              title="Download PDF"
-                            >
-                              <Download size={14} />
-                            </button>
-                            <button
-                              onClick={() => handleSendInvoice(invoice)}
-                              className="btn btn-ghost btn-xs"
-                              title="Send via Email"
-                            >
-                              <Send size={14} />
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
+  {filteredInvoices.length === 0 ? (
+    <tr>
+      <td colSpan="6" className="text-center py-8">
+        <div className="flex flex-col items-center justify-center">
+          <FileText size={48} className="text-base-300 mb-4" />
+          <p className="text-muted">No invoices found</p>
+          {invoices.length === 0 && (
+            <button 
+              onClick={fetchInvoices}
+              className="btn btn-sm btn-primary mt-2"
+            >
+              Try Again
+            </button>
+          )}
+        </div>
+      </td>
+    </tr>
+  ) : (
+    filteredInvoices.map((invoice) => (
+      <tr key={invoice.id} className="hover">
+        <td>
+          <div className="font-mono font-bold">{invoice.id}</div>
+          <div className="text-xs text-muted">
+            {invoice.orderId ? `Order: ${invoice.orderId}` : 'No order ID'}
+          </div>
+        </td>
+        <td>
+          <div>{format(new Date(invoice.date), 'MMM dd, yyyy')}</div>
+          <div className="text-xs text-muted">
+            Due: {format(new Date(invoice.dueDate), 'MMM dd')}
+          </div>
+        </td>
+        <td>
+          <div>{invoice.customer}</div>
+          <div className="text-xs text-muted">{invoice.customerEmail}</div>
+        </td>
+        <td>
+          <div className="font-bold">${invoice.total.toFixed(2)}</div>
+          <div className="text-xs text-muted">
+            ${invoice.amount.toFixed(2)} + ${invoice.tax.toFixed(2)} tax
+          </div>
+        </td>
+        <td>
+          <div className={`badge badge-${getStatusColor(invoice.status)} gap-1`}>
+            {getStatusIcon(invoice.status)}
+            {invoice.status.toUpperCase()}
+          </div>
+        </td>
+        <td>
+          <div className="flex gap-2">
+            <button
+              onClick={() => handleViewInvoice(invoice)}
+              className="btn btn-ghost btn-xs"
+              title="View Invoice"
+            >
+              <Eye size={14} />
+            </button>
+            <button
+              onClick={() => generatePDF(invoice)}
+              className="btn btn-ghost btn-xs"
+              title="Download PDF"
+            >
+              <Download size={14} />
+            </button>
+            <button
+              onClick={() => handleSendInvoice(invoice)}
+              className="btn btn-ghost btn-xs"
+              title="Send via Email"
+            >
+              <Send size={14} />
+            </button>
+          </div>
+        </td>
+      </tr>
+    ))
+  )}
+</tbody>
               </table>
             </div>
           </div>

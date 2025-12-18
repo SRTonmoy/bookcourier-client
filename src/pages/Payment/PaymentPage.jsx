@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
-import { getOrderById } from "../../services/orderService";
-import { paymentService } from "../../services/paymentService";
-import { Check, Shield, CreditCard, Wallet, Truck, AlertCircle } from "lucide-react";
+import { Check, Shield, CreditCard, Wallet, Truck, AlertCircle, Receipt } from "lucide-react";
 import axiosSecure from '../../api/axiosSecure';
 
 export default function PaymentPage() {
@@ -14,7 +12,7 @@ export default function PaymentPage() {
   const [loading, setLoading] = useState(true);
   const [processing, setProcessing] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState("cash_on_delivery");
-  const [error, setError] = useState(""); // <--- add this
+  const [error, setError] = useState("");
 
   useEffect(() => {
     const fetchOrder = async () => {
@@ -37,20 +35,75 @@ export default function PaymentPage() {
       }
     };
 
-    fetchOrder(); // <-- you need to actually call it
+    fetchOrder();
   }, [orderId]);
 
-  // Add a stub handlePayment function
   const handlePayment = async () => {
+    if (!order) return;
+    
     setProcessing(true);
+    setError("");
+    
     try {
-      console.log("Processing payment...");
-      // call your payment API here
+      console.log("Processing payment for order:", orderId, "with method:", paymentMethod);
+      
+      // Call your payment API
+      const { data } = await axiosSecure.post('/payments/create', {
+        orderId: order._id,
+        paymentMethod
+      });
+      
+      console.log("Payment response:", data);
+      
+      if (data.success) {
+        // Show success message
+        window.dispatchEvent(new CustomEvent("show-toast", {
+          detail: {
+            type: "success",
+            message: `Payment successful! Invoice #${data.invoiceId} generated.`,
+          },
+        }));
+        
+    
+        setOrder(prev => ({
+          ...prev,
+          paymentStatus: "paid"
+        }));
+        
+      
+        setTimeout(() => {
+       
+       
+          window.dispatchEvent(new CustomEvent("show-invoice-modal", {
+            detail: {
+              invoiceId: data.invoiceId,
+              amount: data.amount,
+              transactionId: data.transactionId
+            }
+          }));
+          
+          // Option 3: Navigate back to orders
+          navigate("/dashboard/my-orders");
+        }, 2000);
+        
+      } else {
+        setError(data.message || "Payment failed");
+      }
     } catch (err) {
-      console.error(err);
+      console.error("Payment error:", err);
+      console.error("Error response:", err.response?.data);
+      
+      setError(err.response?.data?.message || "Payment failed. Please try again.");
+      
+      window.dispatchEvent(new CustomEvent("show-toast", {
+        detail: {
+          type: "error",
+          message: "Payment failed. Please try again.",
+        },
+      }));
     } finally {
       setProcessing(false);
-    } 
+    }
   };
 
   if (loading) {
@@ -108,7 +161,8 @@ export default function PaymentPage() {
 
   const selectedMethod = paymentMethods.find(m => m.id === paymentMethod);
   const totalFee = selectedMethod ? selectedMethod.fee : 0;
-  const finalAmount = order.amount + totalFee;
+  const deliveryFee = order.deliveryFee || 5.00;
+  const finalAmount = order.amount + totalFee + deliveryFee;
 
   return (
     <div className="min-h-screen bg-base-200 py-8">
@@ -118,6 +172,13 @@ export default function PaymentPage() {
           <h1 className="text-3xl font-bold mb-2">Complete Your Payment</h1>
           <p className="text-muted">Order ID: {order._id?.toString().slice(-8) || orderId}</p>
         </div>
+
+        {error && (
+          <div className="alert alert-error mb-6">
+            <AlertCircle size={20} />
+            <span>{error}</span>
+          </div>
+        )}
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Left Column: Order Summary */}
@@ -129,7 +190,7 @@ export default function PaymentPage() {
                 {/* Book Info */}
                 <div className="flex gap-4 p-4 bg-base-200 rounded-lg mb-6">
                   <img
-                    src={order.bookImage}
+                    src={order.bookImage || '/book-placeholder.png'}
                     alt={order.bookName}
                     className="w-20 h-28 object-cover rounded"
                   />
@@ -138,7 +199,7 @@ export default function PaymentPage() {
                     <p className="text-muted">By {order.bookAuthor}</p>
                     <div className="mt-2">
                       <span className="text-2xl font-bold text-primary">
-                        ${order.bookPrice.toFixed(2)}
+                        ${order.bookPrice?.toFixed(2) || "0.00"}
                       </span>
                     </div>
                   </div>
@@ -216,11 +277,11 @@ export default function PaymentPage() {
                 <div className="space-y-3 mb-6">
                   <div className="flex justify-between">
                     <span>Book Price</span>
-                    <span>${order.bookPrice.toFixed(2)}</span>
+                    <span>${order.bookPrice?.toFixed(2) || "0.00"}</span>
                   </div>
                   <div className="flex justify-between">
                     <span>Delivery Fee</span>
-                    <span>$5.00</span>
+                    <span>${deliveryFee.toFixed(2)}</span>
                   </div>
                   {totalFee > 0 && (
                     <div className="flex justify-between">
@@ -272,6 +333,19 @@ export default function PaymentPage() {
                   )}
                 </button>
 
+                {/* Invoice Info */}
+                {order.paymentStatus === "paid" && (
+                  <div className="mt-4 p-3 bg-success bg-opacity-10 rounded-lg">
+                    <div className="flex items-center gap-2 text-success">
+                      <Receipt size={18} />
+                      <span className="font-medium">Invoice Generated</span>
+                    </div>
+                    <p className="text-sm mt-1">
+                      Payment completed. Check your invoices for details.
+                    </p>
+                  </div>
+                )}
+
                 {/* Terms */}
                 <div className="mt-6 text-xs text-center text-muted">
                   <p>
@@ -284,6 +358,7 @@ export default function PaymentPage() {
                 <button
                   onClick={() => navigate("/dashboard/my-orders")}
                   className="btn btn-ghost btn-sm w-full mt-4"
+                  disabled={processing}
                 >
                   Cancel and Return to Orders
                 </button>

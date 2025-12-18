@@ -23,7 +23,6 @@ export default function DashboardLayout() {
   const location = useLocation();
 
   /* ------------------ EFFECTS ------------------ */
-
   useEffect(() => {
     const onResize = () => {
       if (window.innerWidth >= 768) setMobileSidebarOpen(false);
@@ -39,12 +38,10 @@ export default function DashboardLayout() {
     };
   }, []);
 
-  // Close mobile sidebar on route change
   useEffect(() => {
     setMobileSidebarOpen(false);
   }, [location.pathname]);
 
-  // Lock body scroll when sidebar open
   useEffect(() => {
     document.body.style.overflow = mobileSidebarOpen ? 'hidden' : 'auto';
   }, [mobileSidebarOpen]);
@@ -55,7 +52,6 @@ export default function DashboardLayout() {
   };
 
   /* ------------------ NAV ITEMS ------------------ */
-
   const baseItems = [
     { to: '/dashboard', icon: <Home size={20} />, label: 'Overview', exact: true },
     { to: '/dashboard/my-orders', icon: <ShoppingCart size={20} />, label: 'My Orders' },
@@ -98,7 +94,6 @@ export default function DashboardLayout() {
   };
 
   /* ------------------ JSX ------------------ */
-
   return (
     <div className="flex min-h-screen bg-base-100">
 
@@ -194,6 +189,16 @@ export default function DashboardLayout() {
               >
                 <Menu />
               </button>
+
+              {/* Home button */}
+              <button
+                onClick={() => navigate('/')}
+                className="btn btn-ghost btn-sm flex items-center gap-1"
+              >
+                <Home size={16} />
+                <span className="hidden sm:inline">Home</span>
+              </button>
+
               <h1 className="text-lg font-semibold">{getPageTitle()}</h1>
             </div>
 
@@ -209,7 +214,7 @@ export default function DashboardLayout() {
                 <Bell size={18} />
               </button>
 
-              {/* SETTINGS + THEME (hidden on xs) */}
+              {/* SETTINGS + THEME */}
               <div className="hidden sm:flex items-center gap-2">
                 <button className="btn btn-circle btn-ghost btn-sm">
                   <Settings size={18} />

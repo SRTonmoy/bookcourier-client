@@ -1,6 +1,6 @@
-// pages/Dashboard/user/MyOrders.jsx - FIXED
+
 import React, { useEffect, useState } from 'react';
-// REMOVE THIS LINE: import DashboardLayout from '../../../layout/DashboardLayout';
+
 import axiosSecure from '../../../api/axiosSecure';
 import { useAuth } from '../../../hooks/useAuth';
 import { Link } from 'react-router-dom';
@@ -44,7 +44,7 @@ export default function MyOrders() {
       setCancellingOrder(orderId);
       await axiosSecure.patch(`/orders/${orderId}/cancel`);
       
-      // Update local state
+      
       setOrders(prev => prev.map(order => 
         order._id === orderId 
           ? { ...order, status: 'cancelled' }
@@ -71,9 +71,9 @@ export default function MyOrders() {
   };
 
   const handlePayNow = (orderId) => {
-    // Use react-router navigation instead of window.location
+   
     window.location.href = `/payment/${orderId}`;
-    // OR better: import { useNavigate } and use navigate(`/payment/${orderId}`)
+   
   };
 
   const getStatusIcon = (status) => {

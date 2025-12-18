@@ -12,6 +12,10 @@ export const getAllOrders = () => {
   return axiosSecure.get("/orders");
 };
 
+export const getOrderById = (id) => {
+  return axiosSecure.get(`/orders/${id}`);
+};
+
 export const confirmPayment = (id) => {
   return axiosSecure.patch(`/orders/pay/${id}`);
 };

@@ -46,7 +46,7 @@ export default function PaymentPage() {
     
     try {
       
-      // Call your payment API
+
       const { data } = await axiosSecure.post('/payments/create', {
         orderId: order._id,
         paymentMethod
@@ -55,7 +55,7 @@ export default function PaymentPage() {
       
       
       if (data.success) {
-        // Show success message
+       
         window.dispatchEvent(new CustomEvent("show-toast", {
           detail: {
             type: "success",
@@ -81,7 +81,7 @@ export default function PaymentPage() {
             }
           }));
           
-          // Option 3: Navigate back to orders
+          
           navigate("/dashboard/my-orders");
         }, 2000);
         

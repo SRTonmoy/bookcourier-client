@@ -71,7 +71,7 @@ export default function MyOrders() {
   const handlePayNow = (order) => {
    
     
-    // Navigate to payment page with the order ID
+  
     navigate(`/payment/${order._id}`);
   };
 

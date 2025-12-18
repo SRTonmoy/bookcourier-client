@@ -1,4 +1,4 @@
-// src/services/api.js
+
 import axios from "axios";
 import { getAuth } from "firebase/auth";
 import app from "../firebase/firebase.config";
@@ -7,7 +7,7 @@ import app from "../firebase/firebase.config";
 const BASE_URL = import.meta.env.VITE_SERVER_URL || "http://localhost:5000";
 
 
-// Firebase Auth instance
+
 const auth = getAuth(app);
 
 
@@ -20,7 +20,7 @@ const axiosSecure = axios.create({
   baseURL: BASE_URL,
 });
 
-// Attach JWT token
+
 axiosSecure.interceptors.request.use(
   async (config) => {
     const user = auth.currentUser;
@@ -48,43 +48,37 @@ axiosSecure.interceptors.response.use(
   }
 );
 
-// ------------------------------------------------------
-// 📚 API FUNCTIONS
-// ------------------------------------------------------
 
-// Get all books (public)
 export const getBooks = async () => {
   const res = await axiosPublic.get("/books");
   return res.data;
 };
 
-// Get single book
+
 export const getBookById = async (id) => {
   const res = await axiosPublic.get(`/books/${id}`);
   return res.data;
 };
 
-// Add book (secure)
+
 export const addBook = async (bookData) => {
   const res = await axiosSecure.post("/books", bookData);
   return res.data;
 };
 
-// Delete book (secure)
+
 export const deleteBook = async (id) => {
   const res = await axiosSecure.delete(`/books/${id}`);
   return res.data;
 };
 
-// Update book (secure)
+
 export const updateBook = async (id, data) => {
   const res = await axiosSecure.put(`/books/${id}`, data);
   return res.data;
 };
 
-// ------------------------------------------------------
-// Export axios instances too (optional)
-// ------------------------------------------------------
+
 export const api = {
   public: axiosPublic,
   secure: axiosSecure,

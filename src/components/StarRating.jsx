@@ -88,7 +88,7 @@ const StarRating = ({
   );
 };
 
-// Also export a simpler version for display only
+
 export const DisplayStarRating = ({ rating, size = 'md' }) => {
   const sizeClasses = {
     sm: 'w-4 h-4',

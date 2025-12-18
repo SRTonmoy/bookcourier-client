@@ -40,8 +40,7 @@ export default function AddBook() {
     if (file) {
       setImageFile(file);
       setPreviewUrl(URL.createObjectURL(file));
-      // For now, we'll just use a placeholder URL
-      // In production, upload to Firebase Storage or Cloudinary
+  
       setFormData(prev => ({
         ...prev,
         image: `https://picsum.photos/400/300?random=${Date.now()}`

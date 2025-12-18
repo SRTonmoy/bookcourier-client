@@ -1,14 +1,14 @@
-// components/ThemePreview.jsx - FIXED VERSION
+
 import React from 'react';
 import { useTheme } from '../context/ThemeProvider';
 
 export default function ThemePreview() {
-  // Try to get theme context, but don't crash if not available
+  
   let themeContext;
   try {
     themeContext = useTheme();
   } catch (error) {
-    // Theme context not available, don't render
+   
     return null;
   }
 

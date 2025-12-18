@@ -207,7 +207,7 @@ export const useWishlistStore = create(
         wishlistItems: state.wishlistItems 
       }),
       onRehydrateStorage: () => {
-        // Optional: Log when store is rehydrated
+        
         return (state) => {
           if (state) {
           }

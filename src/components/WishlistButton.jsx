@@ -1,4 +1,4 @@
-// components/WishlistButton.jsx
+
 import React, { useState, useEffect } from 'react';
 import { Heart } from 'lucide-react';
 import { useWishlistStore } from '../store/wishlistStore';
@@ -45,7 +45,7 @@ const WishlistButton = ({
     checkWishlistStatus();
   }, [user, bookId, checkInWishlist]);
 
-  // Also check local state
+ 
   useEffect(() => {
     if (bookId) {
       setInWishlist(isBookInWishlist(bookId));
@@ -74,10 +74,10 @@ const WishlistButton = ({
     setIsAnimating(true);
 
     if (inWishlist) {
-      // Remove from wishlist
+     
       await removeFromWishlist(bookId);
     } else {
-      // Add to wishlist
+  
       await addToWishlist({
         bookId,
         bookName,
@@ -86,11 +86,11 @@ const WishlistButton = ({
       });
     }
 
-    // Animation timeout
+ 
     setTimeout(() => setIsAnimating(false), 600);
   };
 
-  // Size classes
+ 
   const sizeClasses = {
     sm: 'w-8 h-8',
     md: 'w-10 h-10',
@@ -149,7 +149,7 @@ const WishlistButton = ({
       disabled={isLoading || isAnimating}
       title={inWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
     >
-      {/* Heart icon with animation */}
+    
       <Heart
         size={iconSizes[size]}
         className={`transition-all duration-300 ${

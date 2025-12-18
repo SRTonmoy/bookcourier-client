@@ -186,7 +186,7 @@ const CoverageMap = () => {
   useEffect(() => {
     setMounted(true);
     
-    // Fix Leaflet default icons
+    
     delete L.Icon.Default.prototype._getIconUrl;
     L.Icon.Default.mergeOptions({
       iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
@@ -195,16 +195,16 @@ const CoverageMap = () => {
     });
   }, []);
 
-  // Center of Bangladesh
+
   const center = [23.6850, 90.3563];
   const zoom = 7;
 
   const getRadius = (type) => {
     switch(type) {
-      case 'main': return 50000; // 50km
-      case 'major': return 40000; // 40km
-      case 'regional': return 30000; // 30km
-      default: return 20000; // 20km
+      case 'main': return 50000; 
+      case 'major': return 40000; 
+      case 'regional': return 30000; 
+      default: return 20000; 
     }
   };
 

@@ -22,7 +22,7 @@ export default function LibrarianOrders() {
     const { data } = await axiosSecure.get('/orders/librarian/my');
    
     
-    setOrders(data.orders); // <- must use `orders` from backend
+    setOrders(data.orders); 
   } catch (error) {
     
   } finally {
@@ -35,7 +35,7 @@ export default function LibrarianOrders() {
     try {
       await axiosSecure.patch(`/orders/${orderId}/status`, { status: newStatus });
       alert(`Order status updated to ${newStatus}`);
-      fetchOrders(); // Refresh
+      fetchOrders(); 
     } catch (error) {
       console.error('Failed to update order:', error);
       alert('Failed to update order status');

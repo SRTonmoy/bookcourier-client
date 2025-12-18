@@ -93,7 +93,7 @@ export default function MyWishlist() {
     );
   }
 
-  // Debug: Check what data we have
+
   
 
   return (

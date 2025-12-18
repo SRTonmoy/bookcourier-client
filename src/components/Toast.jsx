@@ -1,4 +1,4 @@
-// components/Toast.jsx
+
 import React, { useState, useEffect } from 'react';
 import { CheckCircle, XCircle, Info, AlertCircle, X } from 'lucide-react';
 
@@ -14,7 +14,7 @@ const Toast = () => {
       
       setToasts(prev => [...prev, newToast]);
       
-      // Auto remove after duration
+  
       setTimeout(() => {
         setToasts(prev => prev.filter(toast => toast.id !== id));
       }, duration);

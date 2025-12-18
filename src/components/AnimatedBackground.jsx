@@ -28,7 +28,7 @@ const AnimatedBackground = ({ children }) => {
         className="absolute inset-0"
       />
       
-      {/* Content */}
+      
       <div className="relative z-10">
         {children}
       </div>

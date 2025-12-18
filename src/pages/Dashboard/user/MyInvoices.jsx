@@ -85,12 +85,12 @@ const fetchInvoices = async () => {
       setInvoices(formattedInvoices);
     } else {
      
-      // Fallback to mock data if API returns no data
+    
       setInvoices(mockInvoices);
     }
   } catch (error) {
     console.error('Failed to load invoices:', error);
-    // For development, show mock data
+
     setInvoices(mockInvoices);
   } finally {
     setLoading(false);
@@ -114,7 +114,7 @@ const fetchInvoices = async () => {
     return true;
   });
 
-  // Generate PDF function
+
   const generatePDF = (invoice) => {
     const doc = new jsPDF();
     

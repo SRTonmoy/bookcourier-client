@@ -14,7 +14,7 @@ axiosSecure.interceptors.request.use(
       const user = auth.currentUser;
 
       if (user) {
-        // Force refresh to ensure token is valid
+        
         const token = await user.getIdToken(true);
         config.headers.Authorization = `Bearer ${token}`;
       }
@@ -22,7 +22,7 @@ axiosSecure.interceptors.request.use(
       return config;
     } catch (err) {
       console.error("Axios Secure Interceptor error:", err);
-      return config; // fallback to request without Authorization
+      return config; 
     }
   },
   (error) => {

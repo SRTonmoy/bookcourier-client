@@ -111,7 +111,7 @@ const AnimatedSection = ({
   );
 };
 
-// AnimatedCard component
+
 export const AnimatedCard = ({ 
   icon, 
   title, 
@@ -222,7 +222,7 @@ export const AnimatedCounter = ({
   );
 };
 
-// AnimatedHeading component
+
 export const AnimatedHeading = ({ 
   title, 
   subtitle, 
@@ -244,7 +244,7 @@ export const AnimatedHeading = ({
   );
 };
 
-// AnimatedButton component
+
 export const AnimatedButton = ({ 
   children, 
   href, 
@@ -292,7 +292,7 @@ export const AnimatedButton = ({
   );
 };
 
-// Default feature items for BookCourier
+
 export const defaultFeatures = [
   {
     icon: <Truck size={28} />,
@@ -344,5 +344,5 @@ export const defaultFeatures = [
   }
 ];
 
-// Export AnimatedSection as default
+
 export default AnimatedSection;

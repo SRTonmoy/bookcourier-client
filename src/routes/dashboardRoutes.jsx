@@ -1,7 +1,7 @@
-// routes/dashboardRoutes.js
+
 import { lazy } from 'react';
 
-// User routes
+
 const MyOrders = lazy(() => import('../pages/Dashboard/user/MyOrders'));
 const MyProfile = lazy(() => import('../pages/Dashboard/user/MyProfile'));
 const MyWishlist = lazy(() => import('../pages/Dashboard/user/MyWishlist'));
@@ -30,12 +30,12 @@ export const librarianRoutes = [
   { path: 'my-books', element: <MyBooks /> },
   { path: 'edit-book/:id', element: <EditBook /> },
   { path: 'orders', element: <LibrarianOrders /> },
-  ...userRoutes // Librarians also have user routes
+  ...userRoutes 
 ];
 
 export const adminRoutes = [
   { path: 'all-users', element: <AllUsers /> },
   { path: 'manage-books', element: <ManageBooks /> },
   { path: 'admin-profile', element: <AdminProfile /> },
-  ...userRoutes // Admins also have user routes
+  ...userRoutes 
 ];

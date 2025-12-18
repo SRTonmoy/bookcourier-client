@@ -1,4 +1,4 @@
-// pages/Dashboard/librarian/MyBooks.jsx
+
 import React, { useState, useEffect } from 'react';
 import DashboardLayout from '../../../layout/DashboardLayout';
 import axiosSecure from '../../../api/axiosSecure';
@@ -26,7 +26,7 @@ export default function MyBooks() {
       const { data } = await axiosSecure.get('/books/librarian/my');
       setBooks(data);
       
-      // Calculate stats
+  
       const published = data.filter(b => b.status === 'published').length;
       const unpublished = data.filter(b => b.status === 'unpublished').length;
       

@@ -1,4 +1,4 @@
-// components/ThemeToggle.jsx
+
 import React from 'react';
 import { useTheme } from '../context/ThemeProvider';
 import { Sun, Moon } from 'lucide-react';

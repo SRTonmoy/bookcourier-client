@@ -10,7 +10,7 @@ import ThemePreview from '../components/ThemePreview';
 import Stats from '../pages/Dashboard/user/Stats';
 import SystemSettings from '../pages/Dashboard/user/SystemSettings';
 
-// Lazy load pages for better performance
+
 const Home = lazy(() => import('../pages/Home/Home'));
 const AllBooks = lazy(() => import('../pages/Books/AllBooks'));
 const BookDetails = lazy(() => import('../pages/Books/BookDetails'));
@@ -19,24 +19,22 @@ const Register = lazy(() => import('../pages/Auth/Register'));
 const NotFound = lazy(() => import('../pages/Error/NotFound'));
 const PaymentPage = lazy(() => import('../pages/Payment/PaymentPage'));
 
-// User Dashboard
+
 const MyOrders = lazy(() => import('../pages/Dashboard/user/MyOrders'));
 const MyProfile = lazy(() => import('../pages/Dashboard/user/MyProfile'));
 const MyWishlist = lazy(() => import('../pages/Dashboard/user/MyWishlist'));
 const MyInvoices = lazy(() => import('../pages/Dashboard/user/MyInvoices'));
 
-// Librarian Dashboard
+
 const AddBook = lazy(() => import('../pages/Dashboard/librarian/AddBook'));
 const MyBooks = lazy(() => import('../pages/Dashboard/librarian/MyBooks'));
 const EditBook = lazy(() => import('../pages/Dashboard/librarian/EditBook'));
 const LibrarianOrders = lazy(() => import('../pages/Dashboard/librarian/LibrarianOrders'));
 
-// Admin Dashboard
 const AllUsers = lazy(() => import('../pages/Dashboard/admin/AllUsers'));
 const ManageBooks = lazy(() => import('../pages/Dashboard/admin/ManageBooks'));
 const AdminProfile = lazy(() => import('../pages/Dashboard/admin/AdminProfile'));
 
-// Loading component
 const DashboardLoading = () => (
   <div className="min-h-screen flex items-center justify-center">
     <div className="text-center">
@@ -74,17 +72,17 @@ export default function RoutesApp() {
         {/* Dashboard Routes */}
         <Route path="/dashboard" element={
   <ProtectedRoute>
-    <DashboardLayout /> {/* NO MainLayout wrapper! */}
+    <DashboardLayout /> 
   </ProtectedRoute>
 }>
-          {/* Default redirect based on role */}
+  
           <Route index element={
             role === 'admin' ? <Navigate to="/dashboard/all-users" replace /> :
             role === 'librarian' ? <Navigate to="/dashboard/my-books" replace /> :
             <Navigate to="/dashboard/my-orders" replace />
           } />
           
-          {/* User Routes (accessible by all logged-in users) */}
+         
           <Route path="my-orders" element={<MyOrders />} />
           <Route path="my-profile" element={<MyProfile />} />
           <Route path="wishlist" element={<MyWishlist />} />

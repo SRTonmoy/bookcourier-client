@@ -8,7 +8,7 @@ export default function PaymentSuccess() {
   useEffect(() => {
     const tranId = params.get("tran_id");
     if (tranId) {
-      // later verify payment from backend
+ 
       navigate("/dashboard");
     }
   }, []);

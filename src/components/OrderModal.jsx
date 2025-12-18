@@ -1,4 +1,4 @@
-// components/OrderModal.jsx
+
 import React, { useState, useEffect } from 'react';
 import { X, MapPin, Phone, User, CreditCard, Truck } from 'lucide-react';
 import axiosSecure from '../api/axiosSecure';
@@ -13,7 +13,7 @@ const OrderModal = ({
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
-  const [step, setStep] = useState(1); // 1: Details, 2: Confirm, 3: Success
+  const [step, setStep] = useState(1); 
 
   // Form state
   const [formData, setFormData] = useState({
@@ -25,7 +25,7 @@ const OrderModal = ({
     specialInstructions: ''
   });
 
-  // Initialize form with user data
+  
   useEffect(() => {
     if (user && isOpen) {
       setFormData(prev => ({

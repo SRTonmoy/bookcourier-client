@@ -5,11 +5,11 @@ const ThemeContext = createContext();
 
 export const ThemeProvider = ({ children }) => {
   const [theme, setTheme] = useState(() => {
-    // Check localStorage first, then system preference
+  
     const saved = localStorage.getItem('bookcourier-theme');
     if (saved) return saved;
     
-    // Check system preference
+
     if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
       return 'dark';
     }
@@ -23,11 +23,11 @@ export const ThemeProvider = ({ children }) => {
     setMounted(true);
     localStorage.setItem('bookcourier-theme', theme);
     
-    // Update data-theme attribute on html element
+
     const root = document.documentElement;
     root.setAttribute('data-theme', theme);
     
-    // Update Tailwind/daisyUI theme class
+   
     if (theme === 'dark') {
       root.classList.add('dark');
     } else {

@@ -1,4 +1,4 @@
-// components/ThemeBackground.jsx
+
 import React from 'react';
 import { useTheme } from '../hooks/useTheme';
 

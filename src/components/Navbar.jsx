@@ -97,10 +97,14 @@ export default function Navbar() {
           </li>
           
             <li>
-              <NavLink to="/dashboard" className={navLinkClass}>
-                Dashboard
-              </NavLink>
-            </li>
+  <NavLink
+    to={user ? "/dashboard" : "/login"}
+    className={navLinkClass}
+  >
+    Dashboard
+  </NavLink>
+</li>
+
           
         </ul>
       </div>

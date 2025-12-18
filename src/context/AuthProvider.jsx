@@ -20,22 +20,21 @@ export const AuthProvider = ({ children }) => {
         setUser(currentUser);
 
         try {
-          // Create user in DB if not exists
+       
           await axiosPublic.post("/users", {
             email: currentUser.email,
             name: currentUser.displayName,
           });
 
-          // Wait until currentUser exists in axiosSecure
-          // Fetch role from backend securely
+         
           const res = await axiosSecure.get("/users/role");
           setRole(res.data.role || "user");
         } catch (err) {
           console.error("AuthProvider error:", err);
-          setRole("user"); // fallback to user
+          setRole("user");
         }
       } else {
-        // User logged out
+     
         setUser(null);
         setRole("user");
       }

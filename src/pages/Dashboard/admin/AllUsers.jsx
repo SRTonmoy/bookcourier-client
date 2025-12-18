@@ -66,7 +66,7 @@ export default function AllUsers() {
                 <td>
                   <div className="avatar">
                     <div className="w-10 h-10 rounded-full">
-                      <img src={u.photoURL || '/default-avatar.png'} alt={u.name} />
+                      <img src={u.photoURL || '/user-default.jpg'} alt={u.name} />
                     </div>
                   </div>
                 </td>

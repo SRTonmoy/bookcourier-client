@@ -95,13 +95,13 @@ export default function Navbar() {
               All Books
             </NavLink>
           </li>
-          {user && (
+          
             <li>
               <NavLink to="/dashboard" className={navLinkClass}>
                 Dashboard
               </NavLink>
             </li>
-          )}
+          
         </ul>
       </div>
 

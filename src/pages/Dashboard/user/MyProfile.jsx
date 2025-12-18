@@ -3,7 +3,7 @@ import { useAuth } from "../../../hooks/useAuth";
 import { updateProfile } from "firebase/auth";
 
 export default function MyProfile() {
-  const { user } = useAuth(); // Firebase user
+  const { user } = useAuth(); 
   const [name, setName] = useState(user?.displayName || "");
   const [photoURL, setPhotoURL] = useState(user?.photoURL || "");
 

@@ -1,9 +1,7 @@
-
 import React, { useEffect, useState } from 'react';
-
 import axiosSecure from '../../../api/axiosSecure';
 import { useAuth } from '../../../hooks/useAuth';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom'; // Fixed import
 import { 
   Package, Clock, CheckCircle, XCircle, 
   DollarSign, Truck, RefreshCw, Eye
@@ -14,6 +12,7 @@ export default function MyOrders() {
   const [loading, setLoading] = useState(true);
   const [cancellingOrder, setCancellingOrder] = useState(null);
   const { user } = useAuth();
+  const navigate = useNavigate(); // ADDED THIS LINE - Call the hook!
 
   useEffect(() => {
     fetchOrders();
@@ -44,7 +43,6 @@ export default function MyOrders() {
       setCancellingOrder(orderId);
       await axiosSecure.patch(`/orders/${orderId}/cancel`);
       
-      
       setOrders(prev => prev.map(order => 
         order._id === orderId 
           ? { ...order, status: 'cancelled' }
@@ -70,10 +68,14 @@ export default function MyOrders() {
     }
   };
 
-  const handlePayNow = (orderId) => {
-   
-    window.location.href = `/payment/${orderId}`;
-   
+  const handlePayNow = (order) => {
+    console.log("Order data being passed to payment:", order);
+    console.log("Order ID:", order._id);
+    console.log("Order ID type:", typeof order._id);
+    console.log("Order ID string:", order._id.toString());
+    
+    // Navigate to payment page with the order ID
+    navigate(`/payment/${order._id}`);
   };
 
   const getStatusIcon = (status) => {
@@ -104,7 +106,6 @@ export default function MyOrders() {
 
   if (loading && orders.length === 0) {
     return (
-      // REMOVED DashboardLayout wrapper
       <div className="p-8 text-center">
         <span className="loading loading-spinner loading-lg text-primary"></span>
         <p className="mt-4 text-muted">Loading your orders...</p>
@@ -113,7 +114,6 @@ export default function MyOrders() {
   }
 
   return (
-   
     <div className="max-w-7xl mx-auto space-y-6">
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
@@ -291,7 +291,7 @@ export default function MyOrders() {
                       
                       {order.paymentStatus === 'unpaid' && order.status !== 'cancelled' && (
                         <button
-                          onClick={() => handlePayNow(order._id)}
+                          onClick={() => handlePayNow(order)}
                           className="btn btn-primary btn-xs gap-1"
                         >
                           <DollarSign size={12} />

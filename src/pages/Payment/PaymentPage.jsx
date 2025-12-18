@@ -4,6 +4,7 @@ import { useAuth } from "../../hooks/useAuth";
 import { getOrderById } from "../../services/orderService";
 import { paymentService } from "../../services/paymentService";
 import { Check, Shield, CreditCard, Wallet, Truck, AlertCircle } from "lucide-react";
+import axiosSecure from '../../api/axiosSecure';
 
 export default function PaymentPage() {
   const { orderId } = useParams();
@@ -13,54 +14,43 @@ export default function PaymentPage() {
   const [loading, setLoading] = useState(true);
   const [processing, setProcessing] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState("cash_on_delivery");
+  const [error, setError] = useState(""); // <--- add this
 
   useEffect(() => {
     const fetchOrder = async () => {
       try {
-        const response = await getOrderById(orderId);
-        setOrder(response.order);
-      } catch (error) {
-        console.error("Failed to fetch order:", error);
+        setLoading(true);
+        setError("");
+        console.log("Fetching order with ID:", orderId);
+        const endpoint = `/orders/${orderId}`;
+        const { data } = await axiosSecure.get(endpoint);
+        if (data.success && data.order) {
+          setOrder(data.order);
+        } else {
+          setError("Order not found");
+        }
+      } catch (err) {
+        console.error("Failed to fetch order:", err);
+        setError(err.response?.data?.message || "Failed to load order details");
       } finally {
         setLoading(false);
       }
     };
 
-    fetchOrder();
+    fetchOrder(); // <-- you need to actually call it
   }, [orderId]);
 
+  // Add a stub handlePayment function
   const handlePayment = async () => {
-    if (!order) return;
-
     setProcessing(true);
     try {
-      const result = await paymentService.processPayment(orderId, paymentMethod);
-      
-      if (result.success) {
-        // Show success message
-        window.dispatchEvent(new CustomEvent("show-toast", {
-          detail: {
-            type: "success",
-            message: `Payment successful! Invoice #${result.invoiceId} generated.`,
-          },
-        }));
-        
-        // Redirect to invoices page
-        setTimeout(() => {
-          navigate("/dashboard/invoices");
-        }, 2000);
-      }
-    } catch (error) {
-      console.error("Payment error:", error);
-      window.dispatchEvent(new CustomEvent("show-toast", {
-        detail: {
-          type: "error",
-          message: "Payment failed. Please try again.",
-        },
-      }));
+      console.log("Processing payment...");
+      // call your payment API here
+    } catch (err) {
+      console.error(err);
     } finally {
       setProcessing(false);
-    }
+    } 
   };
 
   if (loading) {

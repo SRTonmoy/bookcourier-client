@@ -10,10 +10,8 @@ export const useWishlistStore = create(
       wishlistItems: [],
       isLoading: false,
       error: null,
-      
-      // ========== MATCHING YOUR SERVER ENDPOINTS ==========
-      
-      // Get user's wishlist - FIXED: Matches "/wishlist/my"
+
+   
       fetchWishlist: async () => {
         try {
           set({ isLoading: true, error: null });

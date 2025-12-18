@@ -4,9 +4,7 @@
 /* DaisyUI plugin */
 @plugin "daisyui";
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+
 
 /* Global variables */
 :root {

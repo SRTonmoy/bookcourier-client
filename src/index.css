@@ -58,9 +58,7 @@ html {
 *::-webkit-scrollbar-track {
   background: #e5e7eb;
 }
-/* styles/global.css - ADD THESE STYLES */
 
-/* Smooth theme transition */
 * {
   transition: background-color 0.3s ease, border-color 0.3s ease;
 }

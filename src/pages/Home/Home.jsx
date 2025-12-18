@@ -58,7 +58,7 @@ export default function Home() {
   }, []);
 
   return (
-    <div>
+    <div style={{ backgroundImage: "url('/background-dashbaord.jpg')" }}>
       {/* ================= HERO SLIDER ================= */}
       <section className="relative overflow-hidden">
         <div className="relative h-[65vh] sm:h-[70vh] w-full">

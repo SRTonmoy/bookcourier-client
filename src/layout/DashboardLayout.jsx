@@ -7,8 +7,7 @@ import {
   Menu, Home, BookOpen, ShoppingCart, User,
   FileText, Heart, Users, BarChart,
   LogOut, PlusCircle, ListOrdered,
-  Shield, LibraryBig,
-  ChevronLeft, ChevronRight,
+  Shield, LibraryBig, ChevronLeft, ChevronRight,
   Search, Bell, Settings
 } from 'lucide-react';
 
@@ -95,7 +94,9 @@ export default function DashboardLayout() {
 
   /* ------------------ JSX ------------------ */
   return (
-    <div className="flex min-h-screen bg-base-100">
+    <div className="relative min-h-screen bg-cover bg-center" style={{ backgroundImage: "url('/background-dashbaord.jpg')" }}>
+      {/* Dark overlay */}
+      <div className="absolute inset-0 bg-black/35 z-0" />
 
       {/* MOBILE OVERLAY */}
       {mobileSidebarOpen && (
@@ -109,7 +110,7 @@ export default function DashboardLayout() {
       <aside
         className={`
           fixed inset-y-0 left-0 z-50
-          bg-gradient-to-b from-base-200 to-base-300/50
+          bg-gradient-to-b from-base-200/80 to-base-300/50
           border-r border-base-300/50 shadow-xl
           transition-all duration-300
           w-72
@@ -174,7 +175,7 @@ export default function DashboardLayout() {
       {/* MAIN CONTENT */}
       <div
         className={`
-          flex-1 transition-all duration-300
+          flex-1 transition-all duration-300 relative
           ml-0
           ${sidebarOpen ? 'md:ml-72' : 'md:ml-20'}
         `}
@@ -226,7 +227,7 @@ export default function DashboardLayout() {
         </header>
 
         {/* CONTENT */}
-        <main className="px-6 py-8 min-h-[calc(100vh-4rem)]">
+        <main className="px-6 py-8 min-h-[calc(100vh-4rem)] bg-white/10 backdrop-blur rounded-lg m-4">
           <Outlet />
         </main>
       </div>

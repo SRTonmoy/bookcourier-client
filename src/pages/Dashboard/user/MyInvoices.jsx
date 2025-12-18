@@ -31,7 +31,7 @@ const fetchInvoices = async () => {
   try {
     
     const response = await axiosSecure.get('/invoices/my');
-    console.log('API Response:', response.data);
+   
     
     if (response.data.success && response.data.invoices) {
       // Transform the API data to match your frontend format
@@ -81,10 +81,10 @@ const fetchInvoices = async () => {
         };
       });
       
-      console.log('Formatted invoices:', formattedInvoices);
+     
       setInvoices(formattedInvoices);
     } else {
-      console.log('No invoices found, using mock data');
+     
       // Fallback to mock data if API returns no data
       setInvoices(mockInvoices);
     }

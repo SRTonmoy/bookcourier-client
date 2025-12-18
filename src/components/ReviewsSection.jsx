@@ -97,15 +97,13 @@ const ReviewsSection = ({ bookId }) => {
   };
 
   const handleEdit = (review) => {
-    // This would open edit modal/form
-    console.log('Edit review:', review);
+    
   };
 
   const handleDelete = async (reviewId) => {
     if (!window.confirm('Are you sure you want to delete this review?')) return;
     
-    // TODO: Implement delete API call
-    console.log('Delete review:', reviewId);
+   
   };
 
   const calculatePercentage = (count) => {

@@ -98,11 +98,11 @@ export default function AllUsers() {
     setLoading(true);
     try {
       const { data } = await axiosSecure.get('/users');
-      console.log('Fetched users data:', data); 
+      
       setUsers(data);
       calculateStats(data);
     } catch (error) {
-      console.error('Failed to fetch users:', error);
+      
       alert('Failed to load users. Please check console for details.');
     } finally {
       setLoading(false);

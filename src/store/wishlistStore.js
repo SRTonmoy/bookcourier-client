@@ -16,10 +16,8 @@ export const useWishlistStore = create(
         try {
           set({ isLoading: true, error: null });
           
-          console.log('Fetching wishlist...');
           const response = await axiosSecure.get('/wishlist/my'); // Changed from '/wishlist'
           
-          console.log('Wishlist response:', response.data);
           
           if (response.data.success) {
             set({ 
@@ -47,10 +45,8 @@ export const useWishlistStore = create(
         try {
           set({ isLoading: true, error: null });
           
-          console.log('Adding to wishlist:', bookData);
           const response = await axiosSecure.post('/wishlist', bookData);
           
-          console.log('Add response:', response.data);
           
           if (response.data.success) {
             // Fetch fresh data from server to ensure consistency
@@ -93,10 +89,8 @@ export const useWishlistStore = create(
         try {
           set({ isLoading: true, error: null });
           
-          console.log('Removing from wishlist:', bookId);
           const response = await axiosSecure.delete(`/wishlist/${bookId}`);
           
-          console.log('Remove response:', response.data);
           
           if (response.data.success) {
             // Remove from local state immediately
@@ -161,7 +155,6 @@ export const useWishlistStore = create(
           
           const response = await axiosSecure.delete('/wishlist/clear/all');
           
-          console.log('Clear response:', response.data);
           
           if (response.data.success) {
             set({ wishlistItems: [] });
@@ -217,7 +210,6 @@ export const useWishlistStore = create(
         // Optional: Log when store is rehydrated
         return (state) => {
           if (state) {
-            console.log('Wishlist store rehydrated with', state.wishlistItems?.length || 0, 'items');
           }
         };
       }

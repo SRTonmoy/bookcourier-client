@@ -417,7 +417,7 @@ export default function BookDetails() {
         onClose={() => setShowOrderModal(false)}
         book={book}
         onOrderSuccess={(order) => {
-          console.log('Order successful:', order);
+         
           window.dispatchEvent(new CustomEvent('show-toast', {
             detail: { 
               type: 'success', 

@@ -21,23 +21,21 @@ export default function MyWishlist() {
   const [isClearing, setIsClearing] = useState(false);
 
   useEffect(() => {
-    console.log('Fetching wishlist...');
+   
     fetchWishlist();
   }, [fetchWishlist]);
 
   useEffect(() => {
-    console.log('Wishlist Items Updated:', wishlistItems);
-    console.log('Number of items:', wishlistItems?.length);
+   
     
     if (wishlistItems?.length > 0) {
-      console.log('First item details:', wishlistItems[0]);
-      console.log('Item properties:', Object.keys(wishlistItems[0]));
+    
     }
   }, [wishlistItems]);
 
   const handleRemove = async (bookId) => {
     if (window.confirm('Remove from wishlist?')) {
-      console.log('Removing book:', bookId);
+     
       await removeFromWishlist(bookId);
     }
   };
@@ -96,7 +94,7 @@ export default function MyWishlist() {
   }
 
   // Debug: Check what data we have
-  console.log('RENDER - Wishlist items:', wishlistItems);
+  
 
   return (
     <div className="p-6">

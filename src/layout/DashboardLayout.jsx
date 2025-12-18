@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link, Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
@@ -8,42 +7,54 @@ import {
   Menu, Home, BookOpen, ShoppingCart, User,
   FileText, Heart, Users, BarChart,
   LogOut, PlusCircle, ListOrdered,
-  Shield, LibraryBig, AlertCircle,
+  Shield, LibraryBig,
   ChevronLeft, ChevronRight,
   Search, Bell, Settings
 } from 'lucide-react';
 
 export default function DashboardLayout() {
-  
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+
   const { user, logout } = useAuth();
   const { role, isLoading } = useRole();
   const navigate = useNavigate();
   const location = useLocation();
 
+  /* ------------------ EFFECTS ------------------ */
+
   useEffect(() => {
     const onResize = () => {
       if (window.innerWidth >= 768) setMobileSidebarOpen(false);
     };
+    const onScroll = () => setScrolled(window.scrollY > 10);
+
     window.addEventListener('resize', onResize);
-    
-    const onScroll = () => {
-      setScrolled(window.scrollY > 10);
-    };
     window.addEventListener('scroll', onScroll);
-    
+
     return () => {
       window.removeEventListener('resize', onResize);
       window.removeEventListener('scroll', onScroll);
     };
   }, []);
 
+  // Close mobile sidebar on route change
+  useEffect(() => {
+    setMobileSidebarOpen(false);
+  }, [location.pathname]);
+
+  // Lock body scroll when sidebar open
+  useEffect(() => {
+    document.body.style.overflow = mobileSidebarOpen ? 'hidden' : 'auto';
+  }, [mobileSidebarOpen]);
+
   const handleLogout = async () => {
     await logout();
     navigate('/');
   };
+
+  /* ------------------ NAV ITEMS ------------------ */
 
   const baseItems = [
     { to: '/dashboard', icon: <Home size={20} />, label: 'Overview', exact: true },
@@ -66,30 +77,27 @@ export default function DashboardLayout() {
     { to: '/dashboard/system', icon: <Shield size={20} />, label: 'System Settings' },
   ];
 
-  const navItems = role === 'admin'
-    ? [...baseItems, ...adminItems]
-    : role === 'librarian'
+  const navItems =
+    role === 'admin'
+      ? [...baseItems, ...adminItems]
+      : role === 'librarian'
       ? [...baseItems, ...librarianItems]
       : baseItems;
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-base-100 to-base-200">
-        <div className="text-center">
-          <span className="loading loading-spinner loading-lg text-primary"></span>
-          <p className="mt-4 text-base-content/60">Loading dashboard...</p>
-        </div>
+      <div className="min-h-screen flex items-center justify-center">
+        <span className="loading loading-spinner loading-lg text-primary" />
       </div>
     );
   }
 
-  // Get current page title from pathname
   const getPageTitle = () => {
-    const path = location.pathname;
-    const allItems = [...baseItems, ...librarianItems, ...adminItems];
-    const currentItem = allItems.find(item => item.to === path);
-    return currentItem?.label || 'Dashboard';
+    const all = [...baseItems, ...librarianItems, ...adminItems];
+    return all.find(i => i.to === location.pathname)?.label || 'Dashboard';
   };
+
+  /* ------------------ JSX ------------------ */
 
   return (
     <div className="flex min-h-screen bg-base-100">
@@ -97,268 +105,136 @@ export default function DashboardLayout() {
       {/* MOBILE OVERLAY */}
       {mobileSidebarOpen && (
         <div
-          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 md:hidden transition-all duration-300"
+          className="fixed inset-0 bg-black/60 z-40 md:hidden"
           onClick={() => setMobileSidebarOpen(false)}
         />
       )}
 
-      {/* SIDEBAR - Enhanced Design */}
+      {/* SIDEBAR */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 bg-gradient-to-b from-base-200 to-base-300/50 border-r border-base-300/50
-        transition-all duration-300 ease-in-out shadow-xl
-        ${sidebarOpen ? 'w-72' : 'w-20'}
-        md:relative
-        ${mobileSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}
+        className={`
+          fixed inset-y-0 left-0 z-50
+          bg-gradient-to-b from-base-200 to-base-300/50
+          border-r border-base-300/50 shadow-xl
+          transition-all duration-300
+          w-72
+          ${sidebarOpen ? 'md:w-72' : 'md:w-20'}
+          ${mobileSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
+        `}
       >
-        <div className="flex flex-col h-full backdrop-blur-sm">
+        <div className="flex flex-col h-full">
 
-          {/* SIDEBAR HEADER - Enhanced */}
-          <div className="h-20 flex items-center justify-between px-4 border-b border-base-300/50">
+          {/* HEADER */}
+          <div className="h-20 flex items-center justify-between px-4 border-b">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-primary to-primary/70 rounded-xl flex items-center justify-center text-white font-bold shadow-lg">
+              <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-white font-bold">
                 BC
               </div>
               {sidebarOpen && (
                 <div>
-                  <span className="font-bold text-lg bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
-                    BookCenter
-                  </span>
-                  <p className="text-xs text-base-content/50 mt-0.5">Dashboard</p>
+                  <p className="font-bold">BookCenter</p>
+                  <p className="text-xs opacity-60">Dashboard</p>
                 </div>
               )}
             </div>
             <button
               onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="btn btn-circle btn-ghost btn-xs hidden md:flex hover:bg-base-300/50"
+              className="btn btn-circle btn-ghost btn-xs hidden md:flex"
             >
               {sidebarOpen ? <ChevronLeft size={16} /> : <ChevronRight size={16} />}
             </button>
           </div>
 
-          {/* USER PROFILE - Added to sidebar */}
-          {sidebarOpen && (
-            <div className="px-4 py-3 border-b border-base-300/30">
-              <div className="flex items-center gap-3 p-2 rounded-lg bg-base-100/50">
-                <div className="avatar">
-                  <div className="w-10 h-10 rounded-full ring-2 ring-primary/20 ring-offset-2 ring-offset-base-200">
-                    <img src={user?.photoURL || '/default-avatar.png'} alt={user?.displayName} />
-                  </div>
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="font-medium text-sm truncate">{user?.displayName}</p>
-                  <p className="text-xs text-base-content/50 truncate">{user?.email}</p>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* NAV - Enhanced */}
-          <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
-            <div className="px-2 py-2">
-              {sidebarOpen && <h3 className="text-xs uppercase tracking-wider text-base-content/40 font-semibold mb-2">Navigation</h3>}
-            </div>
+          {/* NAV */}
+          <nav className="flex-1 p-3 overflow-y-auto">
             {navItems.map(item => (
               <NavLink
                 key={item.to}
                 to={item.to}
                 end={item.exact}
-                onClick={() => setMobileSidebarOpen(false)}
                 className={({ isActive }) =>
-                  `flex items-center rounded-xl transition-all duration-200 group
-                   ${sidebarOpen ? 'gap-3 px-3' : 'justify-center'} py-3 my-0.5
-                   ${isActive 
-                    ? 'bg-gradient-to-r from-primary/10 to-primary/5 text-primary border-l-4 border-primary' 
-                    : 'hover:bg-base-300/30 hover:translate-x-1'}`
+                  `flex items-center gap-3 px-3 py-3 rounded-xl transition
+                   ${isActive ? 'bg-primary/10 text-primary' : 'hover:bg-base-300/40'}`
                 }
               >
-                <div className={`${sidebarOpen ? '' : 'tooltip tooltip-right'} flex-shrink-0`} data-tip={!sidebarOpen && item.label}>
-                  <div className={`
-                    p-1.5 rounded-lg transition-all duration-200
-                    ${sidebarOpen ? 'group-hover:scale-110' : ''}
-                    ${location.pathname === item.to 
-                      ? 'bg-primary/20 text-primary' 
-                      : 'text-base-content/60 group-hover:text-base-content'
-                    }
-                  `}>
-                    {item.icon}
-                  </div>
-                </div>
-                {sidebarOpen && (
-                  <>
-                    <span className="text-sm font-medium flex-1">{item.label}</span>
-                    {location.pathname === item.to && (
-                      <div className="w-2 h-2 rounded-full bg-primary animate-pulse"></div>
-                    )}
-                  </>
-                )}
+                {item.icon}
+                {sidebarOpen && <span>{item.label}</span>}
               </NavLink>
             ))}
           </nav>
 
-          {/* SIDEBAR FOOTER - Enhanced */}
-          <div className="p-4 border-t border-base-300/50 space-y-3 bg-base-200/30">
-            {sidebarOpen && (
-              <div className="flex items-center justify-between px-1">
-                <span className="text-sm text-base-content/60">Appearance</span>
-                <ThemeToggle />
-              </div>
-            )}
-            <button 
-              onClick={handleLogout} 
-              className="btn btn-outline btn-error btn-sm w-full hover:scale-[1.02] transition-transform"
+          {/* FOOTER */}
+          <div className="p-4 border-t">
+            <button
+              onClick={handleLogout}
+              className="btn btn-outline btn-error btn-sm w-full"
             >
               <LogOut size={16} />
               {sidebarOpen && <span className="ml-2">Logout</span>}
             </button>
-            {sidebarOpen && (
-              <p className="text-center text-xs text-base-content/40 pt-2">
-                v2.1.0 • {new Date().getFullYear()}
-              </p>
-            )}
           </div>
         </div>
       </aside>
 
-      {/* MAIN CONTENT AREA */}
-      <div className={`transition-all duration-300 ease-in-out ${sidebarOpen ? 'md:ml-72' : 'md:ml-20'}`}>
-
-        {/* HEADER - Enhanced with better design */}
-        <header className={`
-          sticky top-0 z-40 bg-base-100/80 backdrop-blur-lg border-b border-base-300/50
-          transition-all duration-300
-          ${scrolled ? 'shadow-sm' : ''}
-        `}>
+      {/* MAIN CONTENT */}
+      <div
+        className={`
+          flex-1 transition-all duration-300
+          ml-0
+          ${sidebarOpen ? 'md:ml-72' : 'md:ml-20'}
+        `}
+      >
+        {/* HEADER */}
+        <header className={`sticky top-0 z-40 bg-base-100/80 backdrop-blur border-b ${scrolled ? 'shadow-sm' : ''}`}>
           <div className="h-16 flex items-center justify-between px-6">
             <div className="flex items-center gap-3">
-              <button 
-                onClick={() => setMobileSidebarOpen(true)} 
-                className="btn btn-circle btn-ghost btn-sm md:hidden"
+              <button
+                onClick={() => setMobileSidebarOpen(true)}
+                className="btn btn-ghost btn-sm md:hidden"
               >
-                <Menu size={20} />
+                <Menu />
               </button>
-              <div className="hidden md:block">
-                <h1 className="text-lg font-semibold flex items-center gap-2">
-                  {getPageTitle()}
-                  {role === 'admin' && (
-                    <span className="badge badge-primary badge-xs">Admin</span>
-                  )}
-                  {role === 'librarian' && (
-                    <span className="badge badge-secondary badge-xs">Librarian</span>
-                  )}
-                </h1>
-                <p className="text-sm text-base-content/50 mt-0.5">
-                  Welcome back, <span className="font-medium text-primary">{user?.displayName?.split(' ')[0]}</span>
-                </p>
-              </div>
+              <h1 className="text-lg font-semibold">{getPageTitle()}</h1>
             </div>
-            
-            <div className="flex items-center gap-4">
-              {/* Search Bar */}
-              <div className="hidden md:flex items-center">
-                <div className="relative">
-                  <input
-                    type="text"
-                    placeholder="Search..."
-                    className="input input-sm input-bordered w-48 pl-9 pr-4"
-                  />
-                  <Search size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-base-content/40" />
-                </div>
+
+            <div className="flex items-center gap-3">
+              {/* SEARCH */}
+              <div className="hidden md:flex relative">
+                <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 opacity-50" />
+                <input className="input input-sm pl-9" placeholder="Search" />
               </div>
-              
-              {/* Notifications */}
-              <button className="btn btn-circle btn-ghost btn-sm relative">
-                <Bell size={18} />
-                <span className="absolute -top-1 -right-1 w-4 h-4 bg-error text-error-content text-xs rounded-full flex items-center justify-center">
-                  3
-                </span>
-              </button>
-              
-              {/* Settings */}
+
+              {/* NOTIFICATION */}
               <button className="btn btn-circle btn-ghost btn-sm">
-                <Settings size={18} />
+                <Bell size={18} />
               </button>
-              
-              {/* Theme Toggle */}
-              <ThemeToggle />
-              
-              {/* User Avatar - Desktop */}
-              <div className="hidden md:flex items-center gap-3 pl-3 border-l border-base-300">
-                <div className="text-right">
-                  <p className="text-sm font-medium">{user?.displayName?.split(' ')[0]}</p>
-                  <p className="text-xs text-base-content/50">{role}</p>
-                </div>
-                <div className="avatar">
-                  <div className="w-9 h-9 rounded-full ring-2 ring-primary/20 ring-offset-2 ring-offset-base-100">
-                    <img src={user?.photoURL || '/default-avatar.png'} alt="avatar" />
-                  </div>
-                </div>
+
+              {/* SETTINGS + THEME (hidden on xs) */}
+              <div className="hidden sm:flex items-center gap-2">
+                <button className="btn btn-circle btn-ghost btn-sm">
+                  <Settings size={18} />
+                </button>
+                <ThemeToggle />
               </div>
             </div>
           </div>
         </header>
 
-        {/* BREADCRUMB - Enhanced */}
-        <div className="px-6 py-4 bg-base-100/50 border-b border-base-300/30">
-          <div className="text-sm breadcrumbs flex items-center gap-2">
-            <ul className="flex items-center gap-2">
-              <li>
-                <Link to="/" className="text-base-content/60 hover:text-primary transition-colors">
-                  <Home size={14} className="inline mr-1" />
-                  Home
-                </Link>
-              </li>
-              <li>
-                <span className="text-base-content/30">
-                  <ChevronRight size={14} className="inline" />
-                </span>
-              </li>
-              <li>
-                <Link to="/dashboard" className="text-base-content/60 hover:text-primary transition-colors">
-                  Dashboard
-                </Link>
-              </li>
-              <li>
-                <span className="text-base-content/30">
-                  <ChevronRight size={14} className="inline" />
-                </span>
-              </li>
-              <li className="text-primary font-medium">{getPageTitle()}</li>
-            </ul>
-          </div>
-        </div>
-
-        {/* MAIN CONTENT */}
-        <main className="px-6 py-8 pb-24 min-h-[calc(100vh-12rem)]">
-          <div className="max-w-7xl mx-auto">
-            <Outlet />
-          </div>
+        {/* CONTENT */}
+        <main className="px-6 py-8 min-h-[calc(100vh-4rem)]">
+          <Outlet />
         </main>
-
-        {/* FOOTER */}
-        <footer className="px-6 py-4 border-t border-base-300/30 bg-base-100/50">
-          <div className="flex flex-col md:flex-row items-center justify-between text-sm text-base-content/50">
-            <div>
-              © {new Date().getFullYear()} BookCenter. All rights reserved.
-            </div>
-            <div className="flex items-center gap-4 mt-2 md:mt-0">
-              <Link to="/privacy" className="hover:text-primary transition-colors">Privacy Policy</Link>
-              <Link to="/terms" className="hover:text-primary transition-colors">Terms of Service</Link>
-              <Link to="/help" className="hover:text-primary transition-colors">Help Center</Link>
-            </div>
-          </div>
-        </footer>
       </div>
 
-      {/* MOBILE BOTTOM NAV SAFE AREA - Enhanced */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-base-100 to-base-100/95 border-t border-base-300/50 backdrop-blur-lg" />
-      
-      {/* FLOATING ACTION BUTTON FOR MOBILE */}
-      <button 
-        onClick={() => navigate('/dashboard/add-book')}
-        className="md:hidden fixed bottom-20 right-6 btn btn-circle btn-primary shadow-lg z-30"
-      >
-        <PlusCircle size={24} />
-      </button>
+      {/* FAB – ROLE BASED */}
+      {(role === 'admin' || role === 'librarian') && (
+        <button
+          onClick={() => navigate('/dashboard/add-book')}
+          className="md:hidden fixed bottom-20 right-6 btn btn-circle btn-primary shadow-lg"
+        >
+          <PlusCircle size={24} />
+        </button>
+      )}
     </div>
   );
 }

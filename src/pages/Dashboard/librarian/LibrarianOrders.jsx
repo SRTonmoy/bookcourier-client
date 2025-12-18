@@ -18,26 +18,18 @@ export default function LibrarianOrders() {
   }, [role]);
 
   const fetchOrders = async () => {
-    try {
-      // First get librarian's books
-      const { data: myBooks } = await axiosSecure.get('/books/librarian/my');
-      const bookIds = myBooks.map(book => book._id);
-      
-      if (bookIds.length === 0) {
-        setOrders([]);
-        setLoading(false);
-        return;
-      }
-      
-      // Get orders for these books
-      const { data: allOrders } = await axiosSecure.get('/orders/librarian/my');
-      setOrders(allOrders);
-    } catch (error) {
-      console.error('Failed to fetch orders:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  try {
+    const { data } = await axiosSecure.get('/orders/librarian/my');
+   
+    
+    setOrders(data.orders); // <- must use `orders` from backend
+  } catch (error) {
+    
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   const updateOrderStatus = async (orderId, newStatus) => {
     try {

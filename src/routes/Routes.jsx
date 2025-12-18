@@ -7,6 +7,9 @@ import MainLayout from '../layout/MainLayout';
 import DashboardLayout from '../layout/DashboardLayout';
 import ProtectedRoute from '../components/ProtectedRoute';
 import ThemePreview from '../components/ThemePreview';
+import Stats from '../pages/Dashboard/user/Stats';
+import SystemSettings from '../pages/Dashboard/user/SystemSettings';
+
 // Lazy load pages for better performance
 const Home = lazy(() => import('../pages/Home/Home'));
 const AllBooks = lazy(() => import('../pages/Books/AllBooks'));
@@ -103,7 +106,8 @@ export default function RoutesApp() {
               <Route path="all-users" element={<AllUsers />} />
               <Route path="manage-books" element={<ManageBooks />} />
               <Route path="admin-profile" element={<AdminProfile />} />
-              <Route path="stats" element={<div className="p-6">Statistics Page - Coming Soon</div>} />
+              <Route path="stats" element={<Stats/>} />
+              <Route path="system" element={<SystemSettings />} />
             </>
           ) : null}
         </Route>

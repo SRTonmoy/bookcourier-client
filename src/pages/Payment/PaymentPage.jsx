@@ -19,7 +19,7 @@ export default function PaymentPage() {
       try {
         setLoading(true);
         setError("");
-        console.log("Fetching order with ID:", orderId);
+      
         const endpoint = `/orders/${orderId}`;
         const { data } = await axiosSecure.get(endpoint);
         if (data.success && data.order) {
@@ -45,7 +45,6 @@ export default function PaymentPage() {
     setError("");
     
     try {
-      console.log("Processing payment for order:", orderId, "with method:", paymentMethod);
       
       // Call your payment API
       const { data } = await axiosSecure.post('/payments/create', {
@@ -53,7 +52,7 @@ export default function PaymentPage() {
         paymentMethod
       });
       
-      console.log("Payment response:", data);
+      
       
       if (data.success) {
         // Show success message

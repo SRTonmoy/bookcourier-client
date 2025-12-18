@@ -69,10 +69,7 @@ export default function MyOrders() {
   };
 
   const handlePayNow = (order) => {
-    console.log("Order data being passed to payment:", order);
-    console.log("Order ID:", order._id);
-    console.log("Order ID type:", typeof order._id);
-    console.log("Order ID string:", order._id.toString());
+   
     
     // Navigate to payment page with the order ID
     navigate(`/payment/${order._id}`);

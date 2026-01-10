@@ -3,10 +3,10 @@ import { getAuth } from "firebase/auth";
 import firebaseApp from "../firebase/firebase.config";
 
 const axiosSecure = axios.create({
-  baseURL: import.meta.env.VITE_SERVER_URL, // make sure this ends with /api
+  baseURL: import.meta.env.VITE_SERVER_URL, 
 });
 
-// Interceptor to attach Firebase ID token
+
 axiosSecure.interceptors.request.use(
   async (config) => {
     try {

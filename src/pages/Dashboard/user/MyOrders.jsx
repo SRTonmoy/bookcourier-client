@@ -1,22 +1,46 @@
 import React, { useEffect, useState } from 'react';
 import axiosSecure from '../../../api/axiosSecure';
 import { useAuth } from '../../../hooks/useAuth';
-import { Link, useNavigate } from 'react-router-dom'; // Fixed import
+import { Link, useNavigate } from 'react-router-dom';
 import { 
   Package, Clock, CheckCircle, XCircle, 
-  DollarSign, Truck, RefreshCw, Eye
+  DollarSign, Truck, RefreshCw, Eye,
+  BarChart3, PieChart, TrendingUp, Calendar,
+  Download, Filter
 } from 'lucide-react';
+import {
+  BarChart, Bar, PieChart as RePieChart, Pie, Cell,
+  LineChart, Line, XAxis, YAxis, CartesianGrid,
+  Tooltip, Legend, ResponsiveContainer, AreaChart, Area,
+  RadialBarChart, RadialBar, ComposedChart
+} from 'recharts';
 
 export default function MyOrders() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [cancellingOrder, setCancellingOrder] = useState(null);
   const { user } = useAuth();
-  const navigate = useNavigate(); // ADDED THIS LINE - Call the hook!
+  const navigate = useNavigate();
+  
+  // Chart states
+  const [chartData, setChartData] = useState({
+    monthlySpending: [],
+    statusDistribution: [],
+    paymentDistribution: [],
+    timelineData: []
+  });
+  const [activeChart, setActiveChart] = useState('bar'); // 'bar', 'pie', 'line', 'radial'
+  const [timeRange, setTimeRange] = useState('month'); // 'week', 'month', 'year', 'all'
 
   useEffect(() => {
     fetchOrders();
   }, []);
+
+  useEffect(() => {
+    if (orders.length > 0) {
+      prepareChartData();
+    }
+  }, [orders, timeRange]);
 
   const fetchOrders = async () => {
     try {
@@ -34,6 +58,108 @@ export default function MyOrders() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const prepareChartData = () => {
+    // Prepare monthly spending data
+    const monthlyData = prepareMonthlySpending();
+    
+    // Prepare status distribution
+    const statusData = prepareStatusDistribution();
+    
+    // Prepare payment distribution
+    const paymentData = preparePaymentDistribution();
+    
+    // Prepare timeline data
+    const timelineData = prepareTimelineData();
+    
+    setChartData({
+      monthlySpending: monthlyData,
+      statusDistribution: statusData,
+      paymentDistribution: paymentData,
+      timelineData
+    });
+  };
+
+  const prepareMonthlySpending = () => {
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const currentYear = new Date().getFullYear();
+    
+    return months.map((month, index) => {
+      const monthOrders = orders.filter(order => {
+        const orderDate = new Date(order.orderDate);
+        return orderDate.getMonth() === index && orderDate.getFullYear() === currentYear;
+      });
+      
+      const totalSpent = monthOrders.reduce((sum, order) => sum + (order.amount || 0), 0);
+      const avgOrderValue = monthOrders.length > 0 ? totalSpent / monthOrders.length : 0;
+      
+      return {
+        month,
+        total: totalSpent,
+        orders: monthOrders.length,
+        average: avgOrderValue
+      };
+    }).slice(0, 6); // Last 6 months
+  };
+
+  const prepareStatusDistribution = () => {
+    const statusCounts = {};
+    orders.forEach(order => {
+      statusCounts[order.status] = (statusCounts[order.status] || 0) + 1;
+    });
+    
+    const statusColors = {
+      'pending': '#f59e0b',
+      'processing': '#3b82f6',
+      'shipped': '#8b5cf6',
+      'delivered': '#10b981',
+      'cancelled': '#ef4444'
+    };
+    
+    return Object.entries(statusCounts).map(([status, count]) => ({
+      name: status.charAt(0).toUpperCase() + status.slice(1),
+      value: count,
+      color: statusColors[status] || '#6b7280'
+    }));
+  };
+
+  const preparePaymentDistribution = () => {
+    const paidOrders = orders.filter(o => o.paymentStatus === 'paid').length;
+    const unpaidOrders = orders.filter(o => o.paymentStatus !== 'paid').length;
+    
+    return [
+      { name: 'Paid', value: paidOrders, color: '#10b981' },
+      { name: 'Unpaid', value: unpaidOrders, color: '#f59e0b' }
+    ];
+  };
+
+  const prepareTimelineData = () => {
+    const last30Days = [];
+    const today = new Date();
+    
+    for (let i = 29; i >= 0; i--) {
+      const date = new Date();
+      date.setDate(today.getDate() - i);
+      const dateStr = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      const dateISO = date.toISOString().split('T')[0];
+      
+      const dayOrders = orders.filter(order => 
+        new Date(order.orderDate).toISOString().split('T')[0] === dateISO
+      );
+      
+      const daySpending = dayOrders.reduce((sum, order) => sum + (order.amount || 0), 0);
+      const dayCount = dayOrders.length;
+      
+      last30Days.push({
+        date: dateStr,
+        orders: dayCount,
+        spending: daySpending,
+        avg: dayCount > 0 ? daySpending / dayCount : 0
+      });
+    }
+    
+    return last30Days;
   };
 
   const handleCancelOrder = async (orderId) => {
@@ -69,9 +195,6 @@ export default function MyOrders() {
   };
 
   const handlePayNow = (order) => {
-   
-    
-  
     navigate(`/payment/${order._id}`);
   };
 
@@ -101,6 +224,24 @@ export default function MyOrders() {
     return paymentStatus === 'paid' ? 'badge-success' : 'badge-warning';
   };
 
+  // Custom Tooltip Component
+  const CustomTooltip = ({ active, payload, label }) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="bg-base-100 p-3 border border-base-300 rounded-lg shadow-lg">
+          <p className="font-semibold mb-2">{label}</p>
+          {payload.map((entry, index) => (
+            <p key={index} className="flex items-center gap-2" style={{ color: entry.color }}>
+              <span className="w-3 h-3 rounded-full" style={{ backgroundColor: entry.color }}></span>
+              {entry.name}: {entry.name.includes('$') ? `$${entry.value.toFixed(2)}` : entry.value}
+            </p>
+          ))}
+        </div>
+      );
+    }
+    return null;
+  };
+
   if (loading && orders.length === 0) {
     return (
       <div className="p-8 text-center">
@@ -120,18 +261,38 @@ export default function MyOrders() {
             My Orders
           </h2>
           <p className="text-muted mt-1">
-            Track and manage your book orders
+            Track and manage your book orders with visual insights
           </p>
         </div>
 
         <div className="flex gap-3">
+          <div className="dropdown dropdown-end">
+            <label tabIndex={0} className="btn btn-outline btn-sm gap-2">
+              <Download size={16} />
+              Export
+            </label>
+            <ul tabIndex={0} className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52">
+              <li><a>Export as CSV</a></li>
+              <li><a>Export as PDF</a></li>
+              <li><a>Export Chart Data</a></li>
+            </ul>
+          </div>
           <button 
             onClick={fetchOrders}
             className="btn btn-outline btn-sm gap-2"
             disabled={loading}
           >
-            <RefreshCw size={16} />
-            Refresh
+            {loading ? (
+              <>
+                <span className="loading loading-spinner loading-xs"></span>
+                Loading...
+              </>
+            ) : (
+              <>
+                <RefreshCw size={16} />
+                Refresh
+              </>
+            )}
           </button>
           <Link to="/books" className="btn btn-primary btn-sm gap-2">
             <Package size={16} />
@@ -189,6 +350,194 @@ export default function MyOrders() {
               {orders.filter(o => o.status === 'pending').length}
             </div>
             <div className="stat-desc">Awaiting processing</div>
+          </div>
+        </div>
+      </div>
+
+      {/* Charts Section */}
+      <div className="space-y-6 mb-8">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <div>
+            <h3 className="text-xl font-bold flex items-center gap-2">
+              <BarChart3 className="text-primary" size={24} />
+              Order Analytics
+            </h3>
+            <p className="text-sm text-muted">Visual insights into your order history</p>
+          </div>
+          
+          <div className="flex gap-2">
+            <div className="tabs tabs-boxed">
+              <button 
+                className={`tab ${activeChart === 'bar' ? 'tab-active' : ''}`}
+                onClick={() => setActiveChart('bar')}
+              >
+                <BarChart3 size={16} />
+                Bar
+              </button>
+              <button 
+                className={`tab ${activeChart === 'pie' ? 'tab-active' : ''}`}
+                onClick={() => setActiveChart('pie')}
+              >
+                <PieChart size={16} />
+                Pie
+              </button>
+              <button 
+                className={`tab ${activeChart === 'line' ? 'tab-active' : ''}`}
+                onClick={() => setActiveChart('line')}
+              >
+                <TrendingUp size={16} />
+                Line
+              </button>
+            </div>
+            
+            <div className="dropdown dropdown-end">
+              <label tabIndex={0} className="btn btn-sm btn-outline gap-2">
+                <Filter size={16} />
+                Filter
+              </label>
+              <ul tabIndex={0} className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52">
+                <li><a onClick={() => setTimeRange('week')}>Last Week</a></li>
+                <li><a onClick={() => setTimeRange('month')}>Last Month</a></li>
+                <li><a onClick={() => setTimeRange('year')}>Last Year</a></li>
+                <li><a onClick={() => setTimeRange('all')}>All Time</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Main Chart */}
+          <div className="card bg-base-100 shadow">
+            <div className="card-body">
+              <div className="h-80">
+                {activeChart === 'bar' && (
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={chartData.monthlySpending}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="month" />
+                      <YAxis />
+                      <Tooltip content={<CustomTooltip />} />
+                      <Legend />
+                      <Bar dataKey="total" name="Total Spending ($)" fill="#3b82f6" />
+                      <Bar dataKey="orders" name="Number of Orders" fill="#8b5cf6" />
+                    </BarChart>
+                  </ResponsiveContainer>
+                )}
+                
+                {activeChart === 'pie' && (
+                  <ResponsiveContainer width="100%" height="100%">
+                    <RePieChart>
+                      <Pie
+                        data={chartData.statusDistribution}
+                        cx="50%"
+                        cy="50%"
+                        labelLine={false}
+                        label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                        outerRadius={80}
+                        fill="#8884d8"
+                        dataKey="value"
+                      >
+                        {chartData.statusDistribution.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.color} />
+                        ))}
+                      </Pie>
+                      <Tooltip content={<CustomTooltip />} />
+                      <Legend />
+                    </RePieChart>
+                  </ResponsiveContainer>
+                )}
+                
+                {activeChart === 'line' && (
+                  <ResponsiveContainer width="100%" height="100%">
+                    <AreaChart data={chartData.timelineData}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="date" />
+                      <YAxis />
+                      <Tooltip content={<CustomTooltip />} />
+                      <Legend />
+                      <Area 
+                        type="monotone" 
+                        dataKey="spending" 
+                        name="Daily Spending ($)" 
+                        stroke="#3b82f6" 
+                        fill="#3b82f6" 
+                        fillOpacity={0.3} 
+                      />
+                      <Area 
+                        type="monotone" 
+                        dataKey="orders" 
+                        name="Daily Orders" 
+                        stroke="#8b5cf6" 
+                        fill="#8b5cf6" 
+                        fillOpacity={0.3} 
+                      />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Additional Stats Charts */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Payment Status Chart */}
+            <div className="card bg-base-100 shadow">
+              <div className="card-body">
+                <h4 className="font-bold mb-4 flex items-center gap-2">
+                  <DollarSign size={18} />
+                  Payment Status
+                </h4>
+                <div className="h-48">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <RePieChart>
+                      <Pie
+                        data={chartData.paymentDistribution}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={30}
+                        outerRadius={60}
+                        paddingAngle={5}
+                        dataKey="value"
+                        label={({ name, value }) => `${name}: ${value}`}
+                      >
+                        {chartData.paymentDistribution.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.color} />
+                        ))}
+                      </Pie>
+                      <Tooltip />
+                    </RePieChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+            </div>
+
+            {/* Order Timeline */}
+            <div className="card bg-base-100 shadow">
+              <div className="card-body">
+                <h4 className="font-bold mb-4 flex items-center gap-2">
+                  <Calendar size={18} />
+                  Recent Activity
+                </h4>
+                <div className="h-48">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={chartData.timelineData.slice(-7)}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="date" />
+                      <YAxis />
+                      <Tooltip />
+                      <Line 
+                        type="monotone" 
+                        dataKey="orders" 
+                        name="Orders per day" 
+                        stroke="#10b981" 
+                        strokeWidth={2}
+                        dot={{ r: 4 }}
+                      />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>

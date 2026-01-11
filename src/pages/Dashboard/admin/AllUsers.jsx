@@ -1,18 +1,27 @@
-// pages/Dashboard/admin/AllUsers.jsx - FIXED VERSION
+// pages/Dashboard/admin/AllUsers.jsx - WITH CHARTS
 import React, { useState, useEffect } from 'react';
 import DashboardLayout from '../../../layout/DashboardLayout';
 import axiosSecure from '../../../api/axiosSecure';
 import { useAuth } from '../../../hooks/useAuth';
 import { useRole } from '../../../hooks/useRole';
-import { User, AlertCircle, RefreshCw, Shield, BookOpen } from 'lucide-react';
+import { 
+  User, AlertCircle, RefreshCw, Shield, BookOpen, 
+  BarChart3, PieChart, TrendingUp, Calendar,
+  Download, Filter
+} from 'lucide-react';
 
-// User avatar component with fallback
+// Import Recharts components
+import {
+  BarChart, Bar, PieChart as RePieChart, Pie, Cell,
+  LineChart, Line, XAxis, YAxis, CartesianGrid,
+  Tooltip, Legend, ResponsiveContainer, AreaChart, Area
+} from 'recharts';
+
+// User avatar component with fallback (unchanged)
 const UserAvatar = ({ user, size = 'md' }) => {
   const [imgError, setImgError] = useState(false);
   
-  // Determine the best image source
   const getImageSrc = () => {
-    // Try various possible image properties
     const sources = [
       user.photoURL,
       user.avatar,
@@ -27,14 +36,12 @@ const UserAvatar = ({ user, size = 'md' }) => {
   const imageSrc = getImageSrc();
   const hasImage = imageSrc && !imgError;
   
-  // Size classes
   const sizeClasses = {
     sm: 'w-8 h-8 text-xs',
     md: 'w-12 h-12 text-base',
     lg: 'w-16 h-16 text-xl'
   };
   
-  // Role colors for avatar background
   const getRoleColor = (role) => {
     switch(role) {
       case 'admin': return 'bg-gradient-to-br from-primary to-purple-600';
@@ -43,7 +50,6 @@ const UserAvatar = ({ user, size = 'md' }) => {
     }
   };
   
-  // Get initials from name or email
   const getInitials = () => {
     const name = user.name || user.displayName || user.email || 'User';
     return name
@@ -72,7 +78,6 @@ const UserAvatar = ({ user, size = 'md' }) => {
         </div>
       )}
       
-      {/* Online status indicator */}
       {user.isOnline && (
         <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full ring-2 ring-base-100"></div>
       )}
@@ -87,6 +92,15 @@ export default function AllUsers() {
   const { user: currentUser } = useAuth();
   const { role } = useRole();
   const [stats, setStats] = useState({ total: 0, admins: 0, librarians: 0, users: 0 });
+  
+  // New state for charts
+  const [chartData, setChartData] = useState({
+    roleDistribution: [],
+    userGrowth: [],
+    activityData: []
+  });
+  const [activeChart, setActiveChart] = useState('bar'); // 'bar', 'pie', 'line'
+  const [timeFilter, setTimeFilter] = useState('all'); // 'all', 'month', 'week'
 
   useEffect(() => {
     if (role === 'admin') {
@@ -94,15 +108,20 @@ export default function AllUsers() {
     }
   }, [role]);
 
+  useEffect(() => {
+    if (users.length > 0) {
+      prepareChartData();
+    }
+  }, [users, timeFilter]);
+
   const fetchUsers = async () => {
     setLoading(true);
     try {
       const { data } = await axiosSecure.get('/users');
-      
       setUsers(data);
       calculateStats(data);
     } catch (error) {
-      
+      console.error('Error fetching users:', error);
       alert('Failed to load users. Please check console for details.');
     } finally {
       setLoading(false);
@@ -117,6 +136,63 @@ export default function AllUsers() {
       users: usersList.filter(u => (!u.role || u.role === 'user')).length
     };
     setStats(stats);
+  };
+
+  const prepareChartData = () => {
+    // Prepare role distribution data
+    const roleData = [
+      { name: 'Admins', value: stats.admins, color: '#3b82f6' },
+      { name: 'Librarians', value: stats.librarians, color: '#8b5cf6' },
+      { name: 'Users', value: stats.users, color: '#6b7280' }
+    ].filter(item => item.value > 0);
+
+    // Prepare user growth data (by join date)
+    const userGrowth = prepareUserGrowthData();
+    
+    // Prepare activity data (mock data - you can replace with real data)
+    const activityData = prepareActivityData();
+
+    setChartData({
+      roleDistribution: roleData,
+      userGrowth,
+      activityData
+    });
+  };
+
+  const prepareUserGrowthData = () => {
+    const now = new Date();
+    const userGrowth = [];
+    
+    // Create last 7 days data
+    for (let i = 6; i >= 0; i--) {
+      const date = new Date();
+      date.setDate(now.getDate() - i);
+      const dateStr = date.toLocaleDateString('en-US', { weekday: 'short' });
+      
+      // Count users who joined on or before this day
+      const usersBeforeDate = users.filter(user => {
+        const joinDate = new Date(user.createdAt || user.joinedDate || Date.now());
+        return joinDate <= date;
+      }).length;
+      
+      userGrowth.push({
+        date: dateStr,
+        users: usersBeforeDate,
+        newUsers: Math.floor(Math.random() * 5) // Mock new users data
+      });
+    }
+    
+    return userGrowth;
+  };
+
+  const prepareActivityData = () => {
+    // Mock activity data - you should replace with real data from your backend
+    const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    return days.map(day => ({
+      day,
+      active: Math.floor(Math.random() * 20) + 10,
+      new: Math.floor(Math.random() * 5) + 1
+    }));
   };
 
   const updateRole = async (userId, email, newRole) => {
@@ -187,6 +263,23 @@ export default function AllUsers() {
     );
   }
 
+  // Custom tooltip for charts
+  const CustomTooltip = ({ active, payload, label }) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="bg-base-100 p-3 border border-base-300 rounded-lg shadow-lg">
+          <p className="font-semibold">{label}</p>
+          {payload.map((entry, index) => (
+            <p key={index} style={{ color: entry.color }}>
+              {entry.name}: {entry.value}
+            </p>
+          ))}
+        </div>
+      );
+    }
+    return null;
+  };
+
   return (
     <div className="p-6 space-y-6">
       {/* Header */}
@@ -196,26 +289,39 @@ export default function AllUsers() {
             <Shield className="text-primary" size={28} />
             Manage Users
           </h2>
-          <p className="text-muted mt-1">Manage user roles and permissions</p>
+          <p className="text-muted mt-1">Manage user roles and permissions with visual insights</p>
         </div>
         
-        <button
-          onClick={fetchUsers}
-          className="btn btn-outline btn-sm gap-2"
-          disabled={loading}
-        >
-          {loading ? (
-            <>
-              <span className="loading loading-spinner loading-xs"></span>
-              Loading...
-            </>
-          ) : (
-            <>
-              <RefreshCw size={16} />
-              Refresh
-            </>
-          )}
-        </button>
+        <div className="flex gap-2">
+          <div className="dropdown dropdown-end">
+            <label tabIndex={0} className="btn btn-outline btn-sm gap-2">
+              <Download size={16} />
+              Export
+            </label>
+            <ul tabIndex={0} className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52">
+              <li><a>Export as CSV</a></li>
+              <li><a>Export as PDF</a></li>
+              <li><a>Export Chart Data</a></li>
+            </ul>
+          </div>
+          <button
+            onClick={fetchUsers}
+            className="btn btn-outline btn-sm gap-2"
+            disabled={loading}
+          >
+            {loading ? (
+              <>
+                <span className="loading loading-spinner loading-xs"></span>
+                Loading...
+              </>
+            ) : (
+              <>
+                <RefreshCw size={16} />
+                Refresh
+              </>
+            )}
+          </button>
+        </div>
       </div>
 
       {/* Stats Cards */}
@@ -227,6 +333,7 @@ export default function AllUsers() {
             </div>
             <div className="stat-title">Total Users</div>
             <div className="stat-value">{stats.total}</div>
+            <div className="stat-desc">↗︎ {chartData.userGrowth[chartData.userGrowth.length - 1]?.newUsers || 0} new this week</div>
           </div>
         </div>
         
@@ -237,6 +344,7 @@ export default function AllUsers() {
             </div>
             <div className="stat-title">Admins</div>
             <div className="stat-value">{stats.admins}</div>
+            <div className="stat-desc">{((stats.admins / stats.total) * 100).toFixed(1)}% of total</div>
           </div>
         </div>
         
@@ -247,6 +355,7 @@ export default function AllUsers() {
             </div>
             <div className="stat-title">Librarians</div>
             <div className="stat-value">{stats.librarians}</div>
+            <div className="stat-desc">{((stats.librarians / stats.total) * 100).toFixed(1)}% of total</div>
           </div>
         </div>
         
@@ -257,6 +366,139 @@ export default function AllUsers() {
             </div>
             <div className="stat-title">Regular Users</div>
             <div className="stat-value">{stats.users}</div>
+            <div className="stat-desc">{((stats.users / stats.total) * 100).toFixed(1)}% of total</div>
+          </div>
+        </div>
+      </div>
+
+      {/* Charts Section */}
+      <div className="space-y-6">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <div>
+            <h3 className="text-xl font-bold flex items-center gap-2">
+              <BarChart3 className="text-primary" size={24} />
+              User Analytics
+            </h3>
+            <p className="text-sm text-muted">Visual insights into user distribution and growth</p>
+          </div>
+          
+          <div className="flex gap-2">
+            <div className="tabs tabs-boxed">
+              <button 
+                className={`tab ${activeChart === 'bar' ? 'tab-active' : ''}`}
+                onClick={() => setActiveChart('bar')}
+              >
+                <BarChart3 size={16} />
+                Bar
+              </button>
+              <button 
+                className={`tab ${activeChart === 'pie' ? 'tab-active' : ''}`}
+                onClick={() => setActiveChart('pie')}
+              >
+                <PieChart size={16} />
+                Pie
+              </button>
+              <button 
+                className={`tab ${activeChart === 'line' ? 'tab-active' : ''}`}
+                onClick={() => setActiveChart('line')}
+              >
+                <TrendingUp size={16} />
+                Line
+              </button>
+            </div>
+            
+            <div className="dropdown dropdown-end">
+              <label tabIndex={0} className="btn btn-sm btn-outline gap-2">
+                <Filter size={16} />
+                Filter
+              </label>
+              <ul tabIndex={0} className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52">
+                <li><a onClick={() => setTimeFilter('all')}>All Time</a></li>
+                <li><a onClick={() => setTimeFilter('month')}>Last Month</a></li>
+                <li><a onClick={() => setTimeFilter('week')}>Last Week</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Main Chart */}
+          <div className="card bg-base-100 shadow">
+            <div className="card-body">
+              <div className="h-80">
+                {activeChart === 'bar' && (
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={chartData.roleDistribution}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="name" />
+                      <YAxis />
+                      <Tooltip content={<CustomTooltip />} />
+                      <Legend />
+                      <Bar dataKey="value" name="Number of Users" fill="#3b82f6" />
+                    </BarChart>
+                  </ResponsiveContainer>
+                )}
+                
+                {activeChart === 'pie' && (
+                  <ResponsiveContainer width="100%" height="100%">
+                    <RePieChart>
+                      <Pie
+                        data={chartData.roleDistribution}
+                        cx="50%"
+                        cy="50%"
+                        labelLine={false}
+                        label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                        outerRadius={80}
+                        fill="#8884d8"
+                        dataKey="value"
+                      >
+                        {chartData.roleDistribution.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.color} />
+                        ))}
+                      </Pie>
+                      <Tooltip content={<CustomTooltip />} />
+                      <Legend />
+                    </RePieChart>
+                  </ResponsiveContainer>
+                )}
+                
+                {activeChart === 'line' && (
+                  <ResponsiveContainer width="100%" height="100%">
+                    <AreaChart data={chartData.userGrowth}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="date" />
+                      <YAxis />
+                      <Tooltip content={<CustomTooltip />} />
+                      <Area type="monotone" dataKey="users" name="Total Users" stroke="#3b82f6" fill="#3b82f6" fillOpacity={0.3} />
+                      <Area type="monotone" dataKey="newUsers" name="New Users" stroke="#8b5cf6" fill="#8b5cf6" fillOpacity={0.3} />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Additional Stats Chart */}
+          <div className="card bg-base-100 shadow">
+            <div className="card-body">
+              <h4 className="font-bold flex items-center gap-2">
+                <TrendingUp size={20} />
+                User Growth Trend
+              </h4>
+              <div className="h-64">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={chartData.userGrowth}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="date" />
+                    <YAxis />
+                    <Tooltip content={<CustomTooltip />} />
+                    <Legend />
+                    <Line type="monotone" dataKey="users" name="Total Users" stroke="#3b82f6" strokeWidth={2} />
+                    <Line type="monotone" dataKey="newUsers" name="New Users" stroke="#10b981" strokeWidth={2} />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -377,9 +619,6 @@ export default function AllUsers() {
           </div>
         </div>
       </div>
-
-      
-      
     </div>
   );
 }

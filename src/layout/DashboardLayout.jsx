@@ -52,7 +52,7 @@ export default function DashboardLayout() {
 
   /* ------------------ NAV ITEMS ------------------ */
   const baseItems = [
-    { to: '/dashboard', icon: <Home size={20} />, label: 'Overview', exact: true },
+    { to: '/dashboard/overview', icon: <Home size={20} />, label: 'Overview', exact: true },
     { to: '/dashboard/my-orders', icon: <ShoppingCart size={20} />, label: 'My Orders' },
     { to: '/dashboard/my-profile', icon: <User size={20} />, label: 'My Profile' },
     { to: '/dashboard/wishlist', icon: <Heart size={20} />, label: 'Wishlist' },

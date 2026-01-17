@@ -4,7 +4,7 @@ The **BookCourier Client** is the frontend application for the BookCourier platf
 
 ## 🔗 Live Demo
 
-> *(Add your deployed client URL here)*
+> [*(Add your deployed client URL here)*](https://bookcourier-4719b.web.app/)
 
 ---
 
